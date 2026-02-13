@@ -1,0 +1,1 @@
+..\Chat\Bin\revuo-chat.exe run -ic -a Installer.Client.InstallerApp -act TemporaryInstallFromDll -pf C:\Work\Sandbox\RSDK\InstallationRequest.json

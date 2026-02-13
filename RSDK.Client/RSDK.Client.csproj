@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Revuo.Abstractions" Version="*" />
-    <PackageReference Include="Revuo.Base" Version="*" />
+    <PackageReference Include="Revuo.Abstractions" Version="1.0.0" />
+    <PackageReference Include="Revuo.Base" Version="1.0.0" />
   </ItemGroup>
 
 </Project>
