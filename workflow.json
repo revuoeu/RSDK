@@ -1,0 +1,25 @@
+{
+  "Name": "Sample Workflow",
+  "Description": "Example workflow demonstrating multiple steps",
+  "Steps": [
+    {
+      "Order": 1,
+      "ApplicationName": "Installer.Client.InstallerApp",
+      "ActionName": "TemporaryInstallFromDll",
+      "ParameterFilePath": "C:\\Work\\Sandbox\\RSDK\\InstallationRequest.json",
+      "ContinueOnError": true
+    },
+    {
+      "Order": 2,
+      "ApplicationName": "Installer.Client.InstallerApp",
+      "ActionName": "ListApplications",
+      "ContinueOnError": true
+    },
+    {
+      "Order": 3,
+      "ApplicationName": "RSDK.Client.SDKApp",
+      "ActionName": "SelectNewProjectType",
+      "ContinueOnError": true
+    }
+  ]
+}

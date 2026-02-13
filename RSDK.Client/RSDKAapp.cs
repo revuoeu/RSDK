@@ -1,9 +1,11 @@
 using Revuo.Chat.Abstraction.Client;
 using Revuo.Chat.Base;
 
-public class SimpleApp : BaseThinClientApp
+namespace RSDK.Client;
+
+public class SDKApp : BaseThinClientApp
 {
-    public SimpleApp() : base(null!)
+    public SDKApp() : base(null!)
     {
     }
 
