@@ -1,0 +1,65 @@
+name: Build and publish DLL to Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  release:
+    types: [published]
+  workflow_dispatch: {}
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '10.x'
+
+      - name: Restore
+        run: dotnet restore ./RSDK.Client/RSDK.Client.csproj
+
+      - name: Build (Release)
+        run: dotnet build ./RSDK.Client/RSDK.Client.csproj --configuration Release --no-restore
+
+      - name: Locate built DLL
+        id: find_dll
+        run: |
+          echo "Searching for RSDK.Client.dll under bin/Release..."
+          DLL_PATH=$(find ./RSDK.Client -type f -path '*/bin/Release/*/RSDK.Client.dll' -print -quit || true)
+          if [ -z "$DLL_PATH" ]; then
+            echo "DLL not found" >&2
+            exit 1
+          fi
+          echo "DLL_PATH=$DLL_PATH" >> $GITHUB_ENV
+          echo "::set-output name=dll::$DLL_PATH"
+
+      - name: Create GitHub release (on tag push)
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |-
+            Automated build — attaching compiled DLL.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload DLL to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && steps.create_release.outputs.upload_url != '' && steps.create_release.outputs.upload_url || github.event.release.upload_url }}
+          asset_path: ${{ env.DLL_PATH }}
+          asset_name: RSDK.Client.dll
+          asset_content_type: application/octet-stream
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
