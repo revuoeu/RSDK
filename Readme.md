@@ -1,6 +1,8 @@
-dotnet run -- show arguments -app InstallerApp -act TemporaryInstallFromDll  
+# RSDK - Revuo Software Development Kit
 
-Arguments payload for 35jsFaNihKu8zfazFfVwE.TemporaryInstallFromDll:
-Type: InstallationRequest
-Instance:
-{"Token":null,"TypeName":"Installer.Model.InstallationRequest","D":{"DllPath":"","Culture":"pl-PL"}}
+This project is an SDK for developing Revuo applications. It provides the necessary tools and client libraries to build, deploy, and manage Revuo-based solutions.
+
+## Usage
+
+# ..\Chat\Bin\revuo-chat.exe run -ic -a Installer.Client.InstallerApp -act TemporaryInstallFromDll -pf C:\Work\Sandbox\RSDK\InstallationRequest.json
+..\Chat\Bin\revuo-chat.exe workflow -f C:\Work\Sandbox\RSDK\workflow.json -o
