@@ -1,6 +1,6 @@
 {
-  "Name": "Sample Workflow",
-  "Description": "Example workflow demonstrating multiple steps",
+  "Name": "Install application from dll",
+  "Description": "Install application, check if it is visible on list and run some action.",
   "Steps": [
     {
       "Order": 1,
