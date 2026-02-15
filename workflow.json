@@ -5,7 +5,7 @@
     {
       "Order": 1,
       "ApplicationName": "Installer.Client.InstallerApp",
-      "ActionName": "TemporaryInstallFromDll",
+      "ActionName": "InstallFromDll",
       "ParameterFilePath": "C:\\Work\\Sandbox\\RSDK\\InstallationRequest.json",
       "ContinueOnError": true
     },

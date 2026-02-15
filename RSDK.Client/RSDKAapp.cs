@@ -8,7 +8,7 @@ public class SDKApp : BaseThinClientApp
     public SDKApp() : base(null!)
     {
     }
-
+ 
     protected override Task OnInit()
     {
         this.AddAction<NewProjectResponse>(SelectNewProjectType);
