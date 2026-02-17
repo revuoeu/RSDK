@@ -11,16 +11,16 @@ public class SDKApp : BaseThinClientApp
  
     protected override Task OnInit()
     {
-        this.AddAction<NewProjectResponse>(SelectNewProjectType);
+        this.AddAction<NewProjectResponse>(NewProject);
 
         return Task.CompletedTask;
     }
 
-    private async Task<NewProjectResponse> SelectNewProjectType(IThinClientContext context)
+    private async Task<NewProjectResponse> NewProject(IThinClientContext context)
     {
         return new NewProjectResponse
         {
-            ProjectType = "RSDKv5",
+            ProjectType = ProjectType.CSharp,
         };
     }
 }

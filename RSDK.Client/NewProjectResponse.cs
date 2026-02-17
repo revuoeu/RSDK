@@ -1,6 +1,11 @@
 using Revuo.Chat.Abstraction.Base;
 
+
+public enum ProjectType
+{
+    CSharp
+}
 public class NewProjectResponse : BasePayload
 {
-    public string ProjectType { get; set; } = string.Empty;
+    public ProjectType ProjectType { get; set; }
 }
