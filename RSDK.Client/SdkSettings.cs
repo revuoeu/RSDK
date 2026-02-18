@@ -1,5 +1,6 @@
 using Revuo.Chat.Abstraction.Base;
 
+namespace RSDK.Client;
 public class SdkSettings : BasePayloadEntity
 {
     internal static readonly string Key = "sdk.settings";

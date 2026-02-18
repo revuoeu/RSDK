@@ -21,6 +21,8 @@ public class SDKApp : BaseThinClientApp
         this.AddAction<SdkSettings>(SaveSdkSettings);
         this.AddControl<SdkSettingsControl>();
 
+        _ = new SdkSettings();
+
         return Task.CompletedTask;
     }
 

@@ -1,6 +1,7 @@
 using Revuo.Chat.Abstraction.Base;
 
 
+namespace RSDK.Client;
 public enum ProjectType
 {
     CSharp
