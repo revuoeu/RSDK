@@ -19,11 +19,15 @@
 
 @code {
   private string ProjectTypeText = "—";
+  private string ProjectPathText = "—";
 
   protected override async Task OnInitializedAsync()
   {
     if (Payload is not null)
+    {
       ProjectTypeText = Payload.ProjectType.ToString();
+      ProjectPathText = string.IsNullOrWhiteSpace(Payload.ProjectPath) ? "—" : Payload.ProjectPath;
+    }
 
     await base.OnInitializedAsync();
   }

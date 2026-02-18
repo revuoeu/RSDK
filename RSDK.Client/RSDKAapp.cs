@@ -12,17 +12,73 @@ public class SDKApp : BaseThinClientApp
  
     protected override Task OnInit()
     {
-        
+        // register existing action + control
         this.AddAction<NewProjectResponse>(NewProject);
         this.AddControl<NewProjectControl>();
+
+        // SDK settings (default folder for new projects)
+        this.AddAction<SdkSettings>(GetSdkSettings);
+        this.AddAction<SdkSettings>(SaveSdkSettings);
+        //this.AddControl<SdkSettingsControl>();
+
         return Task.CompletedTask;
     }
 
     private async Task<NewProjectResponse> NewProject(IThinClientContext context)
     {
-        return new NewProjectResponse
+        var response = new NewProjectResponse
         {
             ProjectType = ProjectType.CSharp,
         };
+
+        try
+        {
+            // attempt to read stored default folder from device storage (key: sdk.defaultNewProjectFolder)
+            dynamic dctx = context;
+            var stored = await dctx.devicestorage.GetAsync<string>("sdk.defaultNewProjectFolder");
+            if (!string.IsNullOrWhiteSpace(stored))
+                response.ProjectPath = stored!;
+        }
+        catch
+        {
+            // ignore — fall back to user's Documents folder if nothing stored
+        }
+
+        if (string.IsNullOrWhiteSpace(response.ProjectPath))
+            response.ProjectPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+        return response;
+    }
+
+    // Returns current SDK settings (reads device storage)
+    private async Task<SdkSettings> GetSdkSettings(IThinClientContext context)
+    {
+        var s = new SdkSettings();
+        try
+        {
+            dynamic dctx = context;
+            var stored = await dctx.devicestorage.GetAsync<string>("sdk.defaultNewProjectFolder");
+            s.DefaultNewProjectFolder = stored ?? string.Empty;
+        }
+        catch
+        {
+            // ignore
+        }
+        return s;
+    }
+
+    // Persist SDK settings (stores into device storage)
+    private async Task<SdkSettings> SaveSdkSettings(IThinClientContext context, SdkSettings request)
+    {
+        try
+        {
+            dynamic dctx = context;
+            await dctx.devicestorage.SetAsync("sdk.defaultNewProjectFolder", request.DefaultNewProjectFolder ?? string.Empty);
+        }
+        catch
+        {
+            // ignore write failures
+        }
+        return request;
     }
 }
