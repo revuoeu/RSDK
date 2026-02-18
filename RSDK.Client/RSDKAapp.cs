@@ -5,12 +5,13 @@ using Revuo.Chat.Base;
 using Revuo.Chat.Client.Base.Abstractions;
 using Revuo.Chat.Common;
 using Revuo.Chat.Abstraction.Extensions;
+using Revuo.Chat.Base.I18N;
 
 namespace RSDK.Client;
 
 public class SDKApp : BaseThinClientApp
 {
-    public SDKApp() : base(null!)
+    public SDKApp() : base(new StaticTranslator(I18N.set))
     {
     }
  
@@ -18,7 +19,7 @@ public class SDKApp : BaseThinClientApp
     {
         // register existing action + control
         this.AddAction<NewProjectResponse>(NewProject);
-        this.AddAction<NewProjectResponse>(CreateNewProject);
+        this.AddAction<NewProjectResponse, ProjectCreateProgress>(CreateNewProject);
         this.AddAction<NewProjectResponse, ProjectCreateProgress>(CreateNewProject_CreateFolder);
         this.AddControl<NewProjectControl>();
 
@@ -30,9 +31,8 @@ public class SDKApp : BaseThinClientApp
         return Task.CompletedTask;
     }
 
-    private async Task CreateNewProject(IThinClientContext context, NewProjectResponse response)
+    private async Task<ProjectCreateProgress> CreateNewProject(IThinClientContext context, NewProjectResponse response)
     {
-        
         //1. create folder
         //2. run dotnet new to create classlib for razor framework 10
         //3. copy howto's
@@ -51,7 +51,7 @@ public class SDKApp : BaseThinClientApp
         var result = await context.RunAction("RSDK.Client.SDKApp", nameof(SDKApp.CreateNewProject_CreateFolder), response) as ProjectCreateProgress;
         result!.ThrowIfError(this.Translator);
 
-        throw new NotImplementedException();
+        return result;
     }
 
     private Task<ProjectCreateProgress> CreateNewProject_CreateFolder(IThinClientContext context, NewProjectResponse response)
