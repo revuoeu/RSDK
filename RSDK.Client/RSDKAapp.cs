@@ -25,6 +25,7 @@ public class SDKApp : BaseThinClientApp
         this.AddAction<ProjectCreateProgress, ProjectCreateProgress>(CreateNewProject_CreateFolder);
         this.AddAction<ProjectCreateProgress, ProjectCreateProgress>(CreateNewProject_DotnetNew);
         this.AddAction<ProjectCreateProgress, ProjectCreateProgress>(CreateNewProject_CopyHowtos);
+        this.AddAction<ProjectCreateProgress, ProjectCreateProgress>(CreateNewProject_CreateSpecificFiles);
         this.AddControl<NewProjectControl>();
 
         // SDK settings (default folder for new projects)
@@ -41,13 +42,15 @@ public class SDKApp : BaseThinClientApp
         //1. create folder
         //2. run dotnet new to create classlib for razor framework 10
         //3. copy howto's
-        //4. create specific files:
+        //4. create specific files: (take them from current project, embeed them as resources or have them 
+        //   as strings in code and write them out):
         // a. github pipilines
         // b. vscode launch and tasks
         // c. revuo files to run workflows for installations and installation
-        //5. create some readme
-        //6. create solution
-        //7. crwate git ignore
+        //5. create simple application
+        //6. use StaticTranslator for transaltions in this simple app
+        //7. add one simple control
+        
         
         // all those actions above can be separte actions that are run in sequence, 
         // and report progress to the user via user control of creations. 
@@ -57,6 +60,7 @@ public class SDKApp : BaseThinClientApp
             nameof(CreateNewProject_CreateFolder),
             nameof(CreateNewProject_DotnetNew),
             nameof(CreateNewProject_CopyHowtos),
+            nameof(CreateNewProject_CreateSpecificFiles),
         };
 
         var stepResult = new ProjectCreateProgress();
@@ -256,6 +260,169 @@ public class SDKApp : BaseThinClientApp
         catch (Exception ex)
         {
             result.WithError(this.Translator, result.Culture, "ERROR_COPY_HOWTO_0", ex.Message);
+            return result;
+        }
+    }
+
+    private async Task<ProjectCreateProgress> CreateNewProject_CreateSpecificFiles(IThinClientContext context, ProjectCreateProgress result)
+    {
+        // step 4 — create specific helper files:
+        // a) GitHub workflows
+        // b) VS Code launch/tasks
+        // c) Revuo workflow / InstallationRequest files
+
+        result.SetStep(this.Translator, result.Culture, nameof(CreateNewProject_CreateSpecificFiles));
+        result.Percent = Math.Max(result.Percent, 60);
+
+        try
+        {
+            var projectPath = result.NewProjectRequest.ProjectPath;
+            var projectName = string.IsNullOrWhiteSpace(result.NewProjectRequest.ProjectName)
+                ? Path.GetFileName(projectPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))
+                : result.NewProjectRequest.ProjectName;
+
+            // --- a) GitHub workflow ---
+            var ghDir = Path.Combine(projectPath, ".github", "workflows");
+            Directory.CreateDirectory(ghDir);
+            var ghWorkflowPath = Path.Combine(ghDir, "ci.yml");
+            var ghWorkflow = $@"name: .NET CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+";
+            File.WriteAllText(ghWorkflowPath, ghWorkflow);
+            result.Log.Add($"Created GitHub workflow: {Path.GetRelativePath(projectPath, ghWorkflowPath)}");
+            result.Percent = 70;
+
+            // --- b) VSCode launch + tasks ---
+            var vsDir = Path.Combine(projectPath, ".vscode");
+            Directory.CreateDirectory(vsDir);
+
+            var tasksJson = $@"{{
+  ""version"": ""2.0.0"",
+  ""tasks"": [
+    {{
+      ""type"": ""process"",
+      ""label"": ""build {projectName}"",
+      ""command"": ""dotnet"",
+      ""args"": [ ""build"", ""${{workspaceFolder}}/{projectName}/{projectName}.csproj"", ""-c"", ""Debug"" ],
+      ""group"": ""build"",
+      ""presentation"": {{ ""echo"": true, ""reveal"": ""always"", ""focus"": false, ""panel"": ""shared"", ""showReuseMessage"": true, ""clear"": false }},
+      ""problemMatcher"": ""$msCompile""
+    }},
+    {{
+      ""type"": ""process"",
+      ""label"": ""build"",
+      ""command"": ""dotnet"",
+      ""args"": [ ""build"", ""${{workspaceFolder}}/{projectName}/{projectName}.csproj"", ""-c"", ""Debug"" ],
+      ""group"": ""build"",
+      ""presentation"": {{ ""echo"": true, ""reveal"": ""always"", ""focus"": false, ""panel"": ""shared"", ""showReuseMessage"": true, ""clear"": false }},
+      ""problemMatcher"": ""$msCompile""
+    }},
+    {{
+      ""type"": ""process"",
+      ""label"": ""test {projectName}"",
+      ""command"": ""dotnet"",
+      ""args"": [ ""test"", ""${{workspaceFolder}}/{projectName}/{projectName}.csproj"", ""-c"", ""Debug"" ],
+      ""group"": ""test"",
+      ""presentation"": {{ ""echo"": true, ""reveal"": ""always"", ""focus"": false, ""panel"": ""shared"", ""showReuseMessage"": true, ""clear"": false }}
+    }},
+    {{
+      ""type"": ""process"",
+      ""label"": ""test"",
+      ""command"": ""dotnet"",
+      ""args"": [ ""test"" ],
+      ""group"": ""test"",
+      ""presentation"": {{ ""echo"": true, ""reveal"": ""always"", ""focus"": false, ""panel"": ""shared"", ""showReuseMessage"": true, ""clear"": false }}
+    }}
+  ]
+}}";
+
+            File.WriteAllText(Path.Combine(vsDir, "tasks.json"), tasksJson);
+
+            var launchJson = $@"{{
+  ""version"": ""0.2.0"",
+  ""configurations"": [
+    {{
+      ""name"": ""C#: {projectName} Debug"",
+      ""type"": ""coreclr"",
+      ""request"": ""attach"",
+      ""processName"": ""{projectName}.exe"",
+      ""preLaunchTask"": ""Run Workflow""
+    }},
+    {{
+      ""name"": ""Launch {projectName}"",
+      ""type"": ""coreclr"",
+      ""request"": ""launch"",
+      ""preLaunchTask"": ""Run Workflow"",
+      ""program"": ""${{workspaceFolder}}/bin/Debug/net10.0/{projectName}.dll"",
+      ""args"": [],
+      ""cwd"": ""${{workspaceFolder}}"",
+      ""stopAtEntry"": false
+    }}
+  ]
+}}";
+
+            File.WriteAllText(Path.Combine(vsDir, "launch.json"), launchJson);
+            result.Log.Add("Created VSCode settings: .vscode/launch.json + .vscode/tasks.json");
+            result.Percent = 80;
+
+            // --- c) Revuo installation / workflow files ---
+            var instRequest = new
+            {
+                Token = (string?)null,
+                TypeName = "Installer.Model.InstallationRequest",
+                D = new
+                {
+                    DllPath = Path.Combine(projectPath, "bin", "Debug", "net10.0", projectName + ".dll"),
+                    Culture = result.Culture ?? string.Empty
+                }
+            };
+
+            var instJson = System.Text.Json.JsonSerializer.Serialize(instRequest, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+            var instPath = Path.Combine(projectPath, "InstallationRequest.json");
+            File.WriteAllText(instPath, instJson);
+
+            var workflow = new
+            {
+                Name = "Install application from dll",
+                Description = "Install application, check if it is visible on list and run some action.",
+                Steps = new object[]
+                {
+                    new { Order = 1, ApplicationName = "Installer.Client.InstallerApp", ActionName = "InstallFromDll", ParameterFilePath = instPath, ContinueOnError = true },
+                    new { Order = 2, ApplicationName = "Installer.Client.InstallerApp", ActionName = "ListApplications", ParameterFilePath = (string?)null, ContinueOnError = true },
+                    new { Order = 3, ApplicationName = "RSDK.Client.SDKApp", ActionName = "SelectNewProjectType", ParameterFilePath = (string?)null, ContinueOnError = true }
+                }
+            };
+
+            var workflowJson = System.Text.Json.JsonSerializer.Serialize(workflow, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+            var workflowPath = Path.Combine(projectPath, "InstallRSDKWorkflow.json");
+            File.WriteAllText(workflowPath, workflowJson);
+            result.Log.Add("Created Revuo workflow files: InstallationRequest.json + InstallRSDKWorkflow.json");
+
+            result.Percent = 95;
+            return result;
+        }
+        catch (Exception ex)
+        {
+            result.WithError(this.Translator, result.Culture, "ERROR_CREATE_FILES_0", ex.Message);
             return result;
         }
     }
