@@ -5,6 +5,9 @@ using Revuo.Chat.Client.Base.Abstractions;
 using Revuo.Chat.Common;
 using Revuo.Chat.Base.I18N;
 using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+using System.IO;
 
 namespace RSDK.Client;
 
@@ -20,6 +23,8 @@ public class SDKApp : BaseThinClientApp
         this.AddAction<NewProjectResponse>(NewProject);
         this.AddAction<NewProjectResponse, ProjectCreateProgress>(CreateNewProject);
         this.AddAction<ProjectCreateProgress, ProjectCreateProgress>(CreateNewProject_CreateFolder);
+        this.AddAction<ProjectCreateProgress, ProjectCreateProgress>(CreateNewProject_DotnetNew);
+        this.AddAction<ProjectCreateProgress, ProjectCreateProgress>(CreateNewProject_CopyHowtos);
         this.AddControl<NewProjectControl>();
 
         // SDK settings (default folder for new projects)
@@ -49,25 +54,37 @@ public class SDKApp : BaseThinClientApp
         // This allows for better error handling and user feedback.
 
         var steps = new []{
-                nameof(CreateNewProject_CreateFolder),
+            nameof(CreateNewProject_CreateFolder),
+            nameof(CreateNewProject_DotnetNew),
+            nameof(CreateNewProject_CopyHowtos),
         };
 
         var stepResult = new ProjectCreateProgress();
         stepResult.NewProjectRequest = newProjectRequest;
         stepResult.Culture = context.CurrentCulture;
 
-        foreach(var step in steps)
+        for (var i = 0; i < steps.Length; i++)
         {
+            var step = steps[i];
+
+            // baseline progress for this step (don't override higher values set by the step itself)
+            var startPercent = (int)Math.Floor(i * 100.0 / steps.Length);
+            var endPercent = (int)Math.Ceiling((i + 1) * 100.0 / steps.Length);
+            stepResult.Percent = Math.Max(stepResult.Percent, startPercent);
+
             stepResult.SetStep(
                 this.Translator,
-                context.CurrentCulture, 
-                nameof(CreateNewProject_CreateFolder));
-        
+                context.CurrentCulture,
+                step);
+
             stepResult = await context.RunAction(
-                "RSDK.Client.SDKApp", 
+                "RSDK.Client.SDKApp",
                 step, stepResult) as ProjectCreateProgress;
-            
-            if(stepResult!.IsError())
+
+            // ensure progress advances at least to the endPercent for this step
+            stepResult.Percent = Math.Max(stepResult.Percent, endPercent);
+
+            if (stepResult!.IsError())
                 return stepResult!;
         }
         
@@ -90,6 +107,157 @@ public class SDKApp : BaseThinClientApp
         Directory.CreateDirectory(result.NewProjectRequest.ProjectPath);
 
         return Task.FromResult(result);
+    }
+
+    private async Task<ProjectCreateProgress> CreateNewProject_DotnetNew(IThinClientContext context, ProjectCreateProgress result)
+    {
+        // run `dotnet new razorclasslib -f net10.0` inside the project folder (create files in existing folder)
+        var projectPath = result.NewProjectRequest.ProjectPath;
+        var projectName = string.IsNullOrWhiteSpace(result.NewProjectRequest.ProjectName)
+            ? System.IO.Path.GetFileName(projectPath.TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar))
+            : result.NewProjectRequest.ProjectName;
+
+        result.SetStep(this.Translator, result.Culture, nameof(CreateNewProject_DotnetNew));
+        result.Percent = 25;
+
+        try
+        {
+            var psi = new System.Diagnostics.ProcessStartInfo("dotnet", $"new razorclasslib -n \"{projectName}\" -f net10.0 -o .")
+            {
+                WorkingDirectory = projectPath,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            };
+
+            using var p = System.Diagnostics.Process.Start(psi)!;
+            var stdout = await p.StandardOutput.ReadToEndAsync();
+            var stderr = await p.StandardError.ReadToEndAsync();
+            await p.WaitForExitAsync();
+
+            if (!string.IsNullOrWhiteSpace(stdout))
+                result.Log.Add(stdout);
+            if (!string.IsNullOrWhiteSpace(stderr))
+                result.Log.Add(stderr);
+
+            if (p.ExitCode != 0)
+            {
+                result.WithError(this.Translator, result.Culture, "ERROR_DOTNET_NEW_FAILED_0", stderr);
+                return result;
+            }
+
+            result.Percent = 45;
+            return result;
+        }
+        catch (Exception ex)
+        {
+            result.WithError(this.Translator, result.Culture, "ERROR_EXCEPTION_0", ex.Message);
+            return result;
+        }
+    }
+
+    private async Task<ProjectCreateProgress> CreateNewProject_CopyHowtos(IThinClientContext context, ProjectCreateProgress result)
+    {
+        // extract Howto files from embedded resources (preferred) or fall back to disk copy
+        result.SetStep(this.Translator, result.Culture, nameof(CreateNewProject_CopyHowtos));
+        result.Percent = 50;
+
+        try
+        {
+            var asm = typeof(SDKApp).Assembly;
+            var resourceNames = asm.GetManifestResourceNames()
+                                   .Where(n => n.IndexOf(".Howto.", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   .ToArray();
+
+            if (resourceNames.Length > 0)
+            {
+                var targetHowto = Path.Combine(result.NewProjectRequest.ProjectPath, "Howto");
+                Directory.CreateDirectory(targetHowto);
+
+                foreach (var resourceName in resourceNames)
+                {
+                    var rest = resourceName.Substring(resourceName.IndexOf(".Howto.", StringComparison.OrdinalIgnoreCase) + ".Howto.".Length);
+                    var parts = rest.Split('.');
+
+                    string fileName;
+                    string[] dirParts;
+
+                    if (parts.Length >= 2)
+                    {
+                        fileName = parts[^2] + "." + parts[^1];
+                        dirParts = parts.Length > 2 ? parts.Take(parts.Length - 2).ToArray() : Array.Empty<string>();
+                    }
+                    else
+                    {
+                        fileName = rest;
+                        dirParts = Array.Empty<string>();
+                    }
+
+                    var relPath = dirParts.Length > 0 ? Path.Combine(Path.Combine(dirParts), fileName) : fileName;
+                    var dest = Path.Combine(targetHowto, relPath);
+                    Directory.CreateDirectory(Path.GetDirectoryName(dest)!);
+
+                    using var rs = asm.GetManifestResourceStream(resourceName);
+                    using var fs = File.Create(dest);
+                    await rs!.CopyToAsync(fs);
+
+                    result.Log.Add($"Extracted resource: {relPath}");
+                }
+
+                result.Percent = 60;
+                return result;
+            }
+
+            // fallback: copy from repo/working directory (existing behaviour)
+            string? howtoSource = null;
+            var dir = new DirectoryInfo(AppContext.BaseDirectory);
+            while (dir != null)
+            {
+                var candidate = Path.Combine(dir.FullName, "Howto");
+                if (Directory.Exists(candidate))
+                {
+                    howtoSource = candidate;
+                    break;
+                }
+
+                dir = dir.Parent;
+            }
+
+            if (howtoSource == null)
+            {
+                var cwdCandidate = Path.Combine(Directory.GetCurrentDirectory(), "Howto");
+                if (Directory.Exists(cwdCandidate))
+                    howtoSource = cwdCandidate;
+            }
+
+            if (howtoSource == null)
+            {
+                result.Log.Add("No Howto folder found; skipping copy.");
+                result.Percent = 55;
+                return result;
+            }
+
+            var targetHowto2 = Path.Combine(result.NewProjectRequest.ProjectPath, "Howto");
+            Directory.CreateDirectory(targetHowto2);
+
+            foreach (var file in Directory.EnumerateFiles(howtoSource, "*", SearchOption.AllDirectories))
+            {
+                var rel = Path.GetRelativePath(howtoSource, file);
+                var dest = Path.Combine(targetHowto2, rel);
+                Directory.CreateDirectory(Path.GetDirectoryName(dest)!);
+                File.Copy(file, dest, true);
+                result.Log.Add($"Copied: {rel}");
+            }
+
+            result.Percent = 60;
+            return result;
+        }
+        catch (Exception ex)
+        {
+            result.WithError(this.Translator, result.Culture, "ERROR_COPY_HOWTO_0", ex.Message);
+            return result;
+        }
     }
 
     private async Task<NewProjectResponse> NewProject(IThinClientContext context)
