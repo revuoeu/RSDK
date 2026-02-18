@@ -18,13 +18,10 @@
     </div>
   </div>
 
-  <div class="row mb-2">
-    <div class="col-12 text-muted">@Payload?.Message</div>
-  </div>
-
+  
   @if (Payload?.IsError() == true)
   {
-    <ErrorLine>@Payload?.Message</ErrorLine>
+    <div class="alert alert-danger mt-3">@Payload?.Message</div>
   }
   else if (Payload?.IsCompleted == true)
   {

@@ -19,7 +19,7 @@ public class SDKApp : BaseThinClientApp
         // register existing action + control
         this.AddAction<NewProjectResponse>(NewProject);
         this.AddAction<NewProjectResponse, ProjectCreateProgress>(CreateNewProject);
-        this.AddAction<NewProjectResponse, ProjectCreateProgress>(CreateNewProject_CreateFolder);
+        this.AddAction<ProjectCreateProgress, ProjectCreateProgress>(CreateNewProject_CreateFolder);
         this.AddControl<NewProjectControl>();
 
         // SDK settings (default folder for new projects)
@@ -31,7 +31,7 @@ public class SDKApp : BaseThinClientApp
         return Task.CompletedTask;
     }
 
-    private async Task<ProjectCreateProgress> CreateNewProject(IThinClientContext context, NewProjectResponse response)
+    private async Task<ProjectCreateProgress> CreateNewProject(IThinClientContext context, NewProjectResponse newProjectRequest)
     {
         //1. create folder
         //2. run dotnet new to create classlib for razor framework 10
@@ -48,31 +48,46 @@ public class SDKApp : BaseThinClientApp
         // and report progress to the user via user control of creations. 
         // This allows for better error handling and user feedback.
 
-        var result = await context.RunAction("RSDK.Client.SDKApp", nameof(SDKApp.CreateNewProject_CreateFolder), response) as ProjectCreateProgress;
+        var steps = new []{
+                nameof(CreateNewProject_CreateFolder),
+        };
+
+        var stepResult = new ProjectCreateProgress();
+        stepResult.NewProjectRequest = newProjectRequest;
+        stepResult.Culture = context.CurrentCulture;
+
+        foreach(var step in steps)
+        {
+            stepResult.SetStep(
+                this.Translator,
+                context.CurrentCulture, 
+                nameof(CreateNewProject_CreateFolder));
         
-        return result;
+            stepResult = await context.RunAction(
+                "RSDK.Client.SDKApp", 
+                step, stepResult) as ProjectCreateProgress;
+            
+            if(stepResult!.IsError())
+                return stepResult!;
+        }
+        
+        return stepResult!;
     }
 
-    private Task<ProjectCreateProgress> CreateNewProject_CreateFolder(IThinClientContext context, NewProjectResponse response)
+    private Task<ProjectCreateProgress> CreateNewProject_CreateFolder(IThinClientContext context, ProjectCreateProgress result)
     {
-        
-        var result = new ProjectCreateProgress();
-        result.SetStep(
-            this.Translator,
-            context.CurrentCulture, 
-            "0_CREATING_FOLDER_1", nameof(CreateNewProject_CreateFolder), response.ProjectPath);
-        
         // if folder exists than fail with error message "Folder already exists"
-        if (Directory.Exists(response.ProjectPath))
+        if (Directory.Exists(result.NewProjectRequest.ProjectPath))
         {
             result.WithError(
                 this.Translator,
-                response, 
-                "ERROR_FOLDER_EXISTS_0", response.ProjectPath);
+                result.Culture, 
+                "ERROR_FOLDER_EXISTS_0", result.NewProjectRequest.ProjectPath);
+            return Task.FromResult(result);
         }
 
         // let's create the folder 
-        Directory.CreateDirectory(response.ProjectPath);
+        Directory.CreateDirectory(result.NewProjectRequest.ProjectPath);
 
         return Task.FromResult(result);
     }

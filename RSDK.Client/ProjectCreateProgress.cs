@@ -16,6 +16,7 @@ public class ProjectCreateProgress : BasePayloadWithError
 
     // textual log / details shown in the UI
     public List<string> Log { get; set; } = new List<string>();
+    public NewProjectResponse NewProjectRequest { get; internal set; }
 
     internal void SetStep(Revuo.Chat.Abstraction.ITranslator translator, string cullture, string format, params object[] args)
     {
