@@ -1,5 +1,6 @@
 using Revuo.Chat.Abstraction.Client;
 using Revuo.Chat.Base;
+using Revuo.Chat.Client.Base.Abstractions;
 
 namespace RSDK.Client;
 
@@ -11,6 +12,7 @@ public class SDKApp : BaseThinClientApp
  
     protected override Task OnInit()
     {
+        
         this.AddAction<NewProjectResponse>(NewProject);
         this.AddControl<NewProjectControl>();
         return Task.CompletedTask;

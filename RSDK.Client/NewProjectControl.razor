@@ -1,0 +1,30 @@
+@namespace RSDK.Client
+@inherits Revuo.Chat.Client.Base.Abstractions.BasePayloadControlThinClient<NewProjectResponse, SDKApp>
+
+<div class="revuo-control new-project-control">
+  <h3>New project result</h3>
+
+  <div>
+    <strong>Project type:</strong>
+    <span>@ProjectTypeText</span>
+  </div>
+
+  @if (!string.IsNullOrEmpty(ProjectTypeText))
+  {
+    <div style="margin-top:8px;color:var(--rv-text-muted);font-size:0.9em;">
+      This control displays the payload returned by the `NewProject` action.
+    </div>
+  }
+</div>
+
+@code {
+  private string ProjectTypeText = "—";
+
+  protected override async Task OnInitializedAsync()
+  {
+    if (Payload is not null)
+      ProjectTypeText = Payload.ProjectType.ToString();
+
+    await base.OnInitializedAsync();
+  }
+}
