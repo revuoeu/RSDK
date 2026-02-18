@@ -4,7 +4,7 @@ Short reference for adding UI controls to your app — copyable steps, examples,
 
 ## 🔎 Overview
 - Controls inherit framework base classes: `BasePayloadControlThinClient<T, TApp>`.
-- Use Bootstrap for layout and styling in UI controls (prefer `row`, `col-*`, `form-control`, `btn`, etc.).
+- Use Bootstrap for layout and styling in UI controls (prefer `row`, `col-*`, `form-control`, `btn`, etc.). **Recommendation:** prefer Bootstrap across all controls for consistent styling, spacing and responsive behavior — this reduces custom CSS and keeps the UI cohesive. Top-level control containers should use `mt-4` and `mb-4` (for example `class="revuo-control ... mt-4 mb-4"`).
 - UI actions should load data in the *Client app* (not in GUI components).
 - For GUI projects that contain `.razor` controls, set the project SDK to `Microsoft.NET.Sdk.Razor` (i.e. `<Project Sdk="Microsoft.NET.Sdk.Razor">`).
 - Register every control in application Init (`this.AddControl<YourControl>()`).
@@ -24,6 +24,16 @@ Short reference for adding UI controls to your app — copyable steps, examples,
    - Add a UI action that loads data and returns a payload (use `AddAction(...)`).
 3. GUI component:
    - Create `.razor` + code‑behind (`.razor.cs`) and prefer splitting markup and C# into the two files; e.g. `NewProjectControl.razor` + `NewProjectControl.razor.cs`, `SdkSettingsControl.razor` + `SdkSettingsControl.razor.cs`. Ensure the code‑behind declares the base class `BasePayloadControlThinClient<...>` or add `@namespace RSDK.Client` in the `.razor` so the app type resolves.
+   - Styling: use consistent vertical spacing on top-level control containers — **recommend `mt-4` and `mb-4`** (for example: `class="revuo-control ... mt-4 mb-4"`).
+   - Data loading & initialization: load data in the *Client app* (OnInit) and return it as the `Payload`. Controls should **not** perform application-level data loading; instead the control's `OnInitialized` / `OnInitializedAsync` should consume `Payload` (already populated) and copy values into local fields for binding. Example:
+
+```csharp
+protected override async Task OnInitializedAsync() {
+  if (Payload is not null) LocalItems = Payload.Items; // bind LocalItems in markup
+  await base.OnInitializedAsync();
+}
+```
+
    - Set `HasActions => true` to enable action discovery.
    - Use `RunAction<TResponse>("ActionName", request)` and `ParentFrame.Show(...)` for navigation.
 4. Application Init: register the control with `this.AddControl<YourControl>()` and add translations.
@@ -50,21 +60,13 @@ private async Task<ShowFooRequest> ShowFooManagement(IThinClientContext ctx) {
 
 @inherits Revuo.Chat.Client.Base.Abstractions.BasePayloadControlThinClient<SdkSettings, SDKApp>
 
-<input class="form-control" @bind="Payload.SomeField" @bind:event="oninput" />
-
-@code {
-  public override bool HasActions => true;
-
-  protected override async Task OnInitializedAsync() {
-    if (Payload?.D != null) Items = Payload.D.Items;
-    await base.OnInitializedAsync();
-  }
-
-  private async Task OpenCreate() {
-    var req = await RunAction<ShowCreateFooRequest>("ShowCreateFoo");
-    await ParentFrame.Show(req); // type-safe navigation
-  }
-}
+<div class="container mt-4 mb-4">
+  <h3>SDK Settings</h3>
+  <div class="mb-3">
+    <label for="someField" class="form-label">Some field</label>
+    <input class="form-control" @bind="Payload.SomeField" @bind:event="oninput" />
+  </div>
+</div>
 ```
 
 ---

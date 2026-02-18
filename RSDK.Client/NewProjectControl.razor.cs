@@ -6,33 +6,21 @@ namespace RSDK.Client
 {
     public partial class NewProjectControl
     {
-        private string ProjectTypeText = "—";
         private string ParentFolder = string.Empty;
         private string ProjectName = "NewProject";
-        private string ProjectPathText = "—";
 
-        private string CombinedPath => string.IsNullOrWhiteSpace(ParentFolder)
-            ? ProjectName
-            : Path.Combine(ParentFolder, ProjectName ?? string.Empty);
+        public ProjectType ProjectType = ProjectType.CSharp;
+
+        public SdkSettings Settings { get; private set; }
+
+        public string ComputedProjectPath => Path.Combine(Settings?.DefaultNewProjectFolder ?? string.Empty, ProjectName);
 
         protected override async Task OnInitializedAsync()
         {
-            if (Payload is not null)
-            {
-                ProjectTypeText = Payload.ProjectType.ToString();
-                ParentFolder = string.IsNullOrWhiteSpace(Payload.ProjectPath)
-                    ? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
-                    : Payload.ProjectPath;
-                ProjectPathText = ParentFolder;
-            }
-
-            await base.OnInitializedAsync();
+            this.Settings = await this.RunAction<SdkSettings>(nameof(SDKApp.GetSdkSettings), null);
+            
         }
 
-        private void CreatePreview()
-        {
-            // Show computed folder path in the UI; actual folder creation is platform-specific and not performed here.
-            ProjectPathText = CombinedPath;
-        }
+
     }
 }

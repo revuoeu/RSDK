@@ -52,7 +52,7 @@ public class SDKApp : BaseThinClientApp
     }
 
     // Returns current SDK settings (reads device storage)
-    private async Task<SdkSettings> GetSdkSettings(IThinClientContext context)
+    public async Task<SdkSettings> GetSdkSettings(IThinClientContext context)
     {
         var s = await context.DeviceStorage!.Get<SdkSettings>(SdkSettings.Key) ?? new SdkSettings();
         if(string.IsNullOrWhiteSpace(s.DefaultNewProjectFolder))
