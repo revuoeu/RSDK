@@ -19,7 +19,7 @@ public class SDKApp : BaseThinClientApp
         // SDK settings (default folder for new projects)
         this.AddAction<SdkSettings>(GetSdkSettings);
         this.AddAction<SdkSettings>(SaveSdkSettings);
-        //this.AddControl<SdkSettingsControl>();
+        this.AddControl<SdkSettingsControl>();
 
         return Task.CompletedTask;
     }
@@ -53,32 +53,18 @@ public class SDKApp : BaseThinClientApp
     // Returns current SDK settings (reads device storage)
     private async Task<SdkSettings> GetSdkSettings(IThinClientContext context)
     {
-        var s = new SdkSettings();
-        try
-        {
-            dynamic dctx = context;
-            var stored = await dctx.devicestorage.GetAsync<string>("sdk.defaultNewProjectFolder");
-            s.DefaultNewProjectFolder = stored ?? string.Empty;
-        }
-        catch
-        {
-            // ignore
-        }
+        var s = await context.DeviceStorage!.Get<SdkSettings>(SdkSettings.Key) ?? new SdkSettings();
+        if(string.IsNullOrWhiteSpace(s.DefaultNewProjectFolder))
+            s.DefaultNewProjectFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+    
         return s;
     }
 
     // Persist SDK settings (stores into device storage)
     private async Task<SdkSettings> SaveSdkSettings(IThinClientContext context, SdkSettings request)
     {
-        try
-        {
-            dynamic dctx = context;
-            await dctx.devicestorage.SetAsync("sdk.defaultNewProjectFolder", request.DefaultNewProjectFolder ?? string.Empty);
-        }
-        catch
-        {
-            // ignore write failures
-        }
+        request.Id = SdkSettings.Key; // ensure the key is set for storage
+        await context.DeviceStorage!.Store(request);
         return request;
     }
 }

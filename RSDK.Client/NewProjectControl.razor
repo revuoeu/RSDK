@@ -1,34 +1,77 @@
 @namespace RSDK.Client
+@using System.IO
 @inherits Revuo.Chat.Client.Base.Abstractions.BasePayloadControlThinClient<NewProjectResponse, SDKApp>
 
-<div class="revuo-control new-project-control">
-  <h3>New project result</h3>
+<div class="revuo-control new-project-control container p-3 border rounded">
+  <h4 class="mb-3">New project</h4>
 
-  <div>
-    <strong>Project type:</strong>
-    <span>@ProjectTypeText</span>
+  <div class="row mb-2 align-items-center">
+    <label class="col-sm-3 col-form-label">Project type</label>
+    <div class="col-sm-9">
+      <div class="form-control-plaintext">@ProjectTypeText</div>
+    </div>
   </div>
 
-  @if (!string.IsNullOrEmpty(ProjectTypeText))
-  {
-    <div style="margin-top:8px;color:var(--rv-text-muted);font-size:0.9em;">
-      This control displays the payload returned by the `NewProject` action.
+  <div class="row mb-2">
+    <label class="col-sm-3 col-form-label">Parent folder</label>
+    <div class="col-sm-9">
+      <div class="form-control-plaintext">@ParentFolder</div>
     </div>
-  }
+  </div>
+
+  <div class="row mb-2">
+    <label class="col-sm-3 col-form-label">Project name</label>
+    <div class="col-sm-9">
+      <input class="form-control" @bind="ProjectName" />
+      <div class="form-text">A new folder with this name will be created under the parent folder.</div>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <label class="col-sm-3 col-form-label">New project folder</label>
+    <div class="col-sm-9">
+      <div class="alert alert-secondary py-2 mb-0 text-truncate" title="@CombinedPath">@CombinedPath</div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button class="btn btn-success" @onclick="CreatePreview">Create (preview)</button>
+  </div>
+
+  <div class="mt-2 text-muted small">Parent folder shown is the SDK default (change via SDK Settings control).</div>
 </div>
 
 @code {
   private string ProjectTypeText = "—";
+  private string ParentFolder = string.Empty;
+  private string ProjectName = "NewProject";
   private string ProjectPathText = "—";
+
+  private string CombinedPath => string.IsNullOrWhiteSpace(ParentFolder)
+    ? ProjectName
+    : Path.Combine(ParentFolder, ProjectName ?? string.Empty);
 
   protected override async Task OnInitializedAsync()
   {
     if (Payload is not null)
     {
       ProjectTypeText = Payload.ProjectType.ToString();
-      ProjectPathText = string.IsNullOrWhiteSpace(Payload.ProjectPath) ? "—" : Payload.ProjectPath;
+      ParentFolder = string.IsNullOrWhiteSpace(Payload.ProjectPath)
+        ? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+        : Payload.ProjectPath;
+      ProjectPathText = ParentFolder;
     }
 
     await base.OnInitializedAsync();
+  }
+
+
+
+
+
+  private void CreatePreview()
+  {
+    // Show computed folder path in the UI; actual folder creation is platform-specific and not performed here.
+    ProjectPathText = CombinedPath;
   }
 }

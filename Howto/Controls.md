@@ -4,6 +4,7 @@ Short reference for adding UI controls to your app — copyable steps, examples,
 
 ## 🔎 Overview
 - Controls inherit framework base classes: `BasePayloadControlThinClient<T, TApp>`.
+- Use Bootstrap for layout and styling in UI controls (prefer `row`, `col-*`, `form-control`, `btn`, etc.).
 - UI actions should load data in the *Client app* (not in GUI components).
 - For GUI projects that contain `.razor` controls, set the project SDK to `Microsoft.NET.Sdk.Razor` (i.e. `<Project Sdk="Microsoft.NET.Sdk.Razor">`).
 - Register every control in application Init (`this.AddControl<YourControl>()`).

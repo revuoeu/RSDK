@@ -1,0 +1,19 @@
+@namespace RSDK.Client
+
+@inherits Revuo.Chat.Client.Base.Abstractions.BasePayloadControlThinClient<SdkSettings, SDKApp>
+
+<div class="revuo-control sdk-settings-control container p-3 border rounded">
+  <h4 class="mb-3">SDK Settings</h4>
+
+  <div class="row mb-2">
+    <label class="col-sm-3 col-form-label">Default new project folder</label>
+    <div class="col-sm-9">
+      <input class="form-control" @bind="DefaultNewProjectFolder" />
+      <div class="form-text">A new project will be created in this folder by default (can be overridden in New Project control).</div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button class="btn btn-primary" @onclick="SaveSettings">Save settings</button>
+  </div>
+</div>
