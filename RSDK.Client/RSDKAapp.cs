@@ -12,7 +12,7 @@ public class SDKApp : BaseThinClientApp
     protected override Task OnInit()
     {
         this.AddAction<NewProjectResponse>(NewProject);
-
+        this.AddControl<NewProjectControl>();
         return Task.CompletedTask;
     }
 
