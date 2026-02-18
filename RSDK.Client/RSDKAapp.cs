@@ -4,6 +4,7 @@ using Revuo.Chat.Abstraction.Extensions;
 using Revuo.Chat.Base;
 using Revuo.Chat.Client.Base.Abstractions;
 using Revuo.Chat.Common;
+using Revuo.Chat.Abstraction.Extensions;
 
 namespace RSDK.Client;
 
@@ -31,6 +32,7 @@ public class SDKApp : BaseThinClientApp
 
     private async Task CreateNewProject(IThinClientContext context, NewProjectResponse response)
     {
+        
         //1. create folder
         //2. run dotnet new to create classlib for razor framework 10
         //3. copy howto's
@@ -54,7 +56,16 @@ public class SDKApp : BaseThinClientApp
 
     private Task<ProjectCreateProgress> CreateNewProject_CreateFolder(IThinClientContext context, NewProjectResponse response)
     {
-        throw new NotImplementedException();
+        var result = new ProjectCreateProgress();
+        // if folder exists than fail with error message "Folder already exists"
+        if (Directory.Exists(response.ProjectPath))
+        {
+            result.WithError(
+                this.Translator,
+                response, 
+                "ERROR_FOLDER_EXISTS_0", response.ProjectPath);
+        }
+        return Task.FromResult(result);
     }
 
     private async Task<NewProjectResponse> NewProject(IThinClientContext context)

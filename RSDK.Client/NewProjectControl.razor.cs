@@ -17,9 +17,16 @@ namespace RSDK.Client
         protected override async Task OnInitializedAsync()
         {
             this.Settings = await this.RunAction<SdkSettings>(nameof(SDKApp.GetSdkSettings), null);
-            
+            if(this.Payload.ProjectName == null)
+                this.Payload.ProjectName = "NewProject";
+
+            int counter=0;            
+            // check if folder exists
+            while (Directory.Exists(this.ComputedProjectPath))
+            {
+                counter++;
+                this.Payload.ProjectName = $"NewProject_{counter}";
+            }
         }
-
-
     }
 }
