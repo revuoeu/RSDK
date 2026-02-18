@@ -1,6 +1,7 @@
 using Revuo.Chat.Abstraction.Client;
 using Revuo.Chat.Base;
 using Revuo.Chat.Client.Base.Abstractions;
+using Revuo.Chat.Common;
 
 namespace RSDK.Client;
 
@@ -20,8 +21,6 @@ public class SDKApp : BaseThinClientApp
         this.AddAction<SdkSettings>(GetSdkSettings);
         this.AddAction<SdkSettings>(SaveSdkSettings);
         this.AddControl<SdkSettingsControl>();
-
-        _ = new SdkSettings();
 
         return Task.CompletedTask;
     }

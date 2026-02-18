@@ -23,7 +23,7 @@ Short reference for adding UI controls to your app — copyable steps, examples,
 2. Client app:
    - Add a UI action that loads data and returns a payload (use `AddAction(...)`).
 3. GUI component:
-   - Create `.razor` + optional code‑behind inheriting `BasePayloadControl*`. **Important:** include the application type's namespace in the `@inherits` generic (for example `@inherits BasePayloadControlThinClient<NewProjectResponse, RSDK.Client.SDKApp>`) or add `@namespace RSDK.Client` at the top of the `.razor` file so the app type resolves.
+   - Create `.razor` + code‑behind (`.razor.cs`) and prefer splitting markup and C# into the two files; e.g. `NewProjectControl.razor` + `NewProjectControl.razor.cs`, `SdkSettingsControl.razor` + `SdkSettingsControl.razor.cs`. Ensure the code‑behind declares the base class `BasePayloadControlThinClient<...>` or add `@namespace RSDK.Client` in the `.razor` so the app type resolves.
    - Set `HasActions => true` to enable action discovery.
    - Use `RunAction<TResponse>("ActionName", request)` and `ParentFrame.Show(...)` for navigation.
 4. Application Init: register the control with `this.AddControl<YourControl>()` and add translations.
@@ -44,7 +44,13 @@ private async Task<ShowFooRequest> ShowFooManagement(IThinClientContext ctx) {
 
 ## ✨ Example — GUI control (.razor / code‑behind)
 ```razor
-@inherits BasePayloadControlFatClient<ShowFooRequest, Foo.Client.FooApp>
+@using Microsoft.AspNetCore.Components.Web
+
+@namespace RSDK.Client
+
+@inherits Revuo.Chat.Client.Base.Abstractions.BasePayloadControlThinClient<SdkSettings, SDKApp>
+
+<input class="form-control" @bind="Payload.SomeField" @bind:event="oninput" />
 
 @code {
   public override bool HasActions => true;
