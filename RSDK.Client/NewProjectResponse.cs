@@ -13,4 +13,6 @@ public class NewProjectResponse : BasePayload
 
     // Full path (folder) where the new project will be created / opened.
     public string ProjectPath { get; set; } = string.Empty;
+
+    public string ProjectName { get; set; } = string.Empty;
 }

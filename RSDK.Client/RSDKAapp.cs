@@ -1,4 +1,6 @@
+using Revuo.Chat.Abstraction.Base;
 using Revuo.Chat.Abstraction.Client;
+using Revuo.Chat.Abstraction.Extensions;
 using Revuo.Chat.Base;
 using Revuo.Chat.Client.Base.Abstractions;
 using Revuo.Chat.Common;
@@ -15,6 +17,8 @@ public class SDKApp : BaseThinClientApp
     {
         // register existing action + control
         this.AddAction<NewProjectResponse>(NewProject);
+        this.AddAction<NewProjectResponse>(CreateNewProject);
+        this.AddAction<NewProjectResponse, ProjectCreateProgress>(CreateNewProject_CreateFolder);
         this.AddControl<NewProjectControl>();
 
         // SDK settings (default folder for new projects)
@@ -23,6 +27,34 @@ public class SDKApp : BaseThinClientApp
         this.AddControl<SdkSettingsControl>();
 
         return Task.CompletedTask;
+    }
+
+    private async Task CreateNewProject(IThinClientContext context, NewProjectResponse response)
+    {
+        //1. create folder
+        //2. run dotnet new to create classlib for razor framework 10
+        //3. copy howto's
+        //4. create specific files:
+        // a. github pipilines
+        // b. vscode launch and tasks
+        // c. revuo files to run workflows for installations and installation
+        //5. create some readme
+        //6. create solution
+        //7. crwate git ignore
+        
+        // all those actions above can be separte actions that are run in sequence, 
+        // and report progress to the user via user control of creations. 
+        // This allows for better error handling and user feedback.
+
+        var result = await context.RunAction("RSDK.Client.SDKApp", nameof(SDKApp.CreateNewProject_CreateFolder), response) as ProjectCreateProgress;
+        result!.ThrowIfError(this.Translator);
+
+        throw new NotImplementedException();
+    }
+
+    private Task<ProjectCreateProgress> CreateNewProject_CreateFolder(IThinClientContext context, NewProjectResponse response)
+    {
+        throw new NotImplementedException();
     }
 
     private async Task<NewProjectResponse> NewProject(IThinClientContext context)
@@ -68,4 +100,8 @@ public class SDKApp : BaseThinClientApp
         await context.DeviceStorage!.Store(request);
         return request;
     }
+}
+
+public class ProjectCreateProgress : BasePayloadWithError
+{
 }

@@ -7,13 +7,12 @@ namespace RSDK.Client
     public partial class NewProjectControl
     {
         private string ParentFolder = string.Empty;
-        private string ProjectName = "NewProject";
 
         public ProjectType ProjectType = ProjectType.CSharp;
 
         public SdkSettings Settings { get; private set; }
 
-        public string ComputedProjectPath => Path.Combine(Settings?.DefaultNewProjectFolder ?? string.Empty, ProjectName);
+        public string ComputedProjectPath => Path.Combine(Settings?.DefaultNewProjectFolder ?? string.Empty, Payload?.ProjectName ?? string.Empty);
 
         protected override async Task OnInitializedAsync()
         {
