@@ -1,11 +1,10 @@
-using Revuo.Chat.Abstraction.Base;
 using Revuo.Chat.Abstraction.Client;
 using Revuo.Chat.Abstraction.Extensions;
 using Revuo.Chat.Base;
 using Revuo.Chat.Client.Base.Abstractions;
 using Revuo.Chat.Common;
-using Revuo.Chat.Abstraction.Extensions;
 using Revuo.Chat.Base.I18N;
+using System.Collections.Generic;
 
 namespace RSDK.Client;
 
@@ -27,6 +26,7 @@ public class SDKApp : BaseThinClientApp
         this.AddAction<SdkSettings>(GetSdkSettings);
         this.AddAction<SdkSettings>(SaveSdkSettings);
         this.AddControl<SdkSettingsControl>();
+        this.AddControl<ProjectCreateProgressControl>();
 
         return Task.CompletedTask;
     }
@@ -49,14 +49,19 @@ public class SDKApp : BaseThinClientApp
         // This allows for better error handling and user feedback.
 
         var result = await context.RunAction("RSDK.Client.SDKApp", nameof(SDKApp.CreateNewProject_CreateFolder), response) as ProjectCreateProgress;
-        result!.ThrowIfError(this.Translator);
-
+        
         return result;
     }
 
     private Task<ProjectCreateProgress> CreateNewProject_CreateFolder(IThinClientContext context, NewProjectResponse response)
     {
+        
         var result = new ProjectCreateProgress();
+        result.SetStep(
+            this.Translator,
+            context.CurrentCulture, 
+            "0_CREATING_FOLDER_1", nameof(CreateNewProject_CreateFolder), response.ProjectPath);
+        
         // if folder exists than fail with error message "Folder already exists"
         if (Directory.Exists(response.ProjectPath))
         {
@@ -65,6 +70,10 @@ public class SDKApp : BaseThinClientApp
                 response, 
                 "ERROR_FOLDER_EXISTS_0", response.ProjectPath);
         }
+
+        // let's create the folder 
+        Directory.CreateDirectory(response.ProjectPath);
+
         return Task.FromResult(result);
     }
 
@@ -111,8 +120,4 @@ public class SDKApp : BaseThinClientApp
         await context.DeviceStorage!.Store(request);
         return request;
     }
-}
-
-public class ProjectCreateProgress : BasePayloadWithError
-{
 }

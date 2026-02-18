@@ -1,0 +1,46 @@
+@namespace RSDK.Client
+@using Revuo.Chat.Abstraction.Extensions;
+
+@inherits Revuo.Chat.Client.Base.Abstractions.BasePayloadControlThinClient<ProjectCreateProgress, SDKApp>
+
+<div class="revuo-control project-create-progress container p-3 border rounded mt-3 mb-3">
+  <h4 class="mb-3">Creating project</h4>
+
+  <div class="mb-3">
+    <div class="progress" style="height: 22px;">
+      <div class="progress-bar @ProgressBarClass" role="progressbar" style="width: @ProgressPercent%" aria-valuenow="@ProgressPercent" aria-valuemin="0" aria-valuemax="100">@ProgressPercent% </div>
+    </div>
+  </div>
+
+  <div class="row mb-2">
+    <div class="col-12">
+      <strong>Step:</strong> @Payload?.CurrentStep
+    </div>
+  </div>
+
+  <div class="row mb-2">
+    <div class="col-12 text-muted">@Payload?.Message</div>
+  </div>
+
+  @if (Payload?.IsError() == true)
+  {
+    <ErrorLine>@Payload?.Message</ErrorLine>
+  }
+  else if (Payload?.IsCompleted == true)
+  {
+    <div class="alert alert-success mt-3">Project creation completed successfully.</div>
+  }
+
+  @if (Payload?.Log?.Count > 0)
+  {
+    <div class="mt-3">
+      <h6>Details</h6>
+      <ul class="small">
+        @foreach (var l in Payload.Log)
+        {
+          <li>@l</li>
+        }
+      </ul>
+    </div>
+  }
+</div>
