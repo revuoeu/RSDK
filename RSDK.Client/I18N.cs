@@ -22,8 +22,7 @@ public static class I18N
                     ["CreateNewProject_CreateSolution"] = "Creating solution and adding projects...",
                     ["CreateNewProject_CreateGitIgnore"] = "Creating .gitignore...",
                     ["CreateNewProject_CreateRevuoApp"] = "Adding Revuo app files...",
-
-                    ["RSDK.Client.SDKApp.NewProject"] = "New project",
+                    ["RSDK.Client.SDKApp"] = "Revuo Software Development Kit",                    ["RSDK.Client.SDKApp.NewProject"] = "New project",
                     ["RSDK.Client.SDKApp.CreateNewProject"] = "Create new project",
                     ["RSDK.Client.SDKApp.CreateNewProject_CreateFolder"] = "Creating project folder",
                     ["RSDK.Client.SDKApp.CreateNewProject_DotnetNew"] = "Scaffolding project (dotnet new)",
@@ -81,10 +80,11 @@ public static class I18N
                     ["CreateNewProject_CreateGitIgnore"] = "Tworzenie pliku .gitignore...",
                     ["CreateNewProject_CreateRevuoApp"] = "Dodawanie plików aplikacji Revuo...",
 
+                    ["RSDK.Client.SDKApp"] = "Zestaw narzędzi programistycznych Revuo",
                     ["RSDK.Client.SDKApp.NewProject"] = "Nowy projekt",
                     ["RSDK.Client.SDKApp.CreateNewProject"] = "Utwórz nowy projekt",
                     ["RSDK.Client.SDKApp.CreateNewProject_CreateFolder"] = "Tworzenie folderu projektu",
-                    ["RSDK.Client.SDKApp.CreateNewProject_DotnetNew"] = "Uruchamianie 'dotnet new' w celu utworzenia projektu...",
+                    ["RSDK.Client.SDKApp.CreateNewProject_DotnetNew"] = "Uruchamianie 'dotnet new' w celu utworzenia projektu..."
                     ["RSDK.Client.SDKApp.CreateNewProject_CopyHowtos"] = "Kopiowanie plików instrukcji (how‑to)...",
                     ["RSDK.Client.SDKApp.CreateNewProject_CreateSpecificFiles"] = "Tworzenie plików specyficznych dla projektu...",
                     ["RSDK.Client.SDKApp.CreateNewProject_CreateReadme"] = "Tworzenie pliku README...",
