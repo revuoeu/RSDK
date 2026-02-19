@@ -2,42 +2,43 @@
 
 @using Microsoft.AspNetCore.Components.Web
 @using System.IO
+@using System.Globalization
 
 @inherits Revuo.Chat.Client.Base.Abstractions.BasePayloadControlThinClient<NewProjectResponse, SDKApp>
 
 <div class="container mt-4 mb-4 new-project-control container p-3 border rounded">
-  <h4 class="mb-3">New project</h4>
+  <h4 class="mb-3">@App.Translator.Format("RSDK.Client.SDKApp.NewProject")</h4>
 
   <div class="row mb-2 align-items-center">
-    <label class="col-sm-3 col-form-label">Project type</label>
+    <label class="col-sm-3 col-form-label">@App.Translator.Format("RSDK.Client.NewProjectControl.ProjectType")</label>
     <div class="col-sm-9">
       <div class="form-control-plaintext">@Payload.ProjectType</div>
     </div>
   </div>
 
   <div class="row mb-2">
-    <label class="col-sm-3 col-form-label">Parent folder</label>
+    <label class="col-sm-3 col-form-label">@App.Translator.Format("RSDK.Client.NewProjectControl.ParentFolder")</label>
     <div class="col-sm-9">
       <div class="form-control-plaintext">@Settings?.DefaultNewProjectFolder</div>
     </div>
   </div>
 
   <div class="row mb-2">
-    <label class="col-sm-3 col-form-label">Project name</label>
+    <label class="col-sm-3 col-form-label">@App.Translator.Format("RSDK.Client.NewProjectControl.ProjectName")</label>
     <div class="col-sm-9">
       <input class="form-control" @bind="Payload.ProjectName" @bind:event="oninput" />
-      <div class="form-text">A new folder with this name will be created under the parent folder.</div>
+      <div class="form-text">@App.Translator.Format("RSDK.Client.NewProjectControl.FolderHelp")</div>
     </div>
   </div>
 
   <div class="row mb-3">
-    <label class="col-sm-3 col-form-label">New project folder</label>
+    <label class="col-sm-3 col-form-label">@App.Translator.Format("RSDK.Client.NewProjectControl.NewProjectFolder")</label>
     <div class="col-sm-9">
       <div class="alert alert-secondary py-2 mb-0 text-truncate" title="@ComputedProjectPath">@ComputedProjectPath</div>
     </div>
   </div>
 
-  <div class="mt-2 text-muted small">Parent folder shown is the SDK default (change via SDK Settings control).</div>
+  <div class="mt-2 text-muted small">@App.Translator.Format("RSDK.Client.NewProjectControl.ParentFolderNote")</div>
 </div>
 
 

@@ -6,6 +6,9 @@ namespace RSDK.Client
 {
     public partial class NewProjectControl
     {
+        // expose a translator instance for Razor markup (shim)
+        protected Revuo.Chat.Abstraction.ITranslator Translator => new Revuo.Chat.Base.I18N.StaticTranslator(I18N.set);
+
         private string ParentFolder = string.Empty;
 
         public ProjectType ProjectType = ProjectType.CSharp;

@@ -36,6 +36,24 @@ public static class I18N
                     ["RSDK.Client.SDKApp.GetSdkSettings"] = "Load SDK settings",
                     ["RSDK.Client.SDKApp.SaveSdkSettings"] = "Save SDK settings",
 
+                    // NewProject UI (labels, help text)
+                    ["RSDK.Client.NewProjectControl.ProjectType"] = "Project type",
+                    ["RSDK.Client.NewProjectControl.ParentFolder"] = "Parent folder",
+                    ["RSDK.Client.NewProjectControl.ProjectName"] = "Project name",
+                    ["RSDK.Client.NewProjectControl.NewProjectFolder"] = "New project folder",
+                    ["RSDK.Client.NewProjectControl.FolderHelp"] = "A new folder with this name will be created under the parent folder.",
+                    ["RSDK.Client.NewProjectControl.ParentFolderNote"] = "Parent folder shown is the SDK default (change via SDK Settings control).",
+
+                    // SDK settings UI
+                    ["RSDK.Client.SdkSettingsControl.Title"] = "SDK Settings",
+                    ["RSDK.Client.SdkSettingsControl.DefaultNewProjectFolder"] = "Default new project folder",
+                    ["RSDK.Client.SdkSettingsControl.HelpText"] = "A new project will be created in this folder by default (can be overridden in New Project control).",
+
+                    // Project creation UI
+                    ["RSDK.Client.ProjectCreateProgressControl.Title"] = "Creating project",
+                    ["RSDK.Client.ProjectCreateProgressControl.Completed"] = "Project creation completed successfully.",
+                    ["RSDK.Client.ProjectCreateProgressControl.Details"] = "Details",
+
                     ["ERROR_FOLDER_EXISTS_0"] = "Folder '{0}' already exists. Please choose a different project name or delete the existing folder.",
                     ["ERROR_DOTNET_NEW_FAILED_0"] = "'dotnet new' failed: {0}",
                     ["ERROR_EXCEPTION_0"] = "Unexpected error: {0}",
@@ -75,6 +93,24 @@ public static class I18N
                     ["RSDK.Client.SDKApp.CreateNewProject_CreateRevuoApp"] = "Dodawanie plików aplikacji Revuo...",
                     ["RSDK.Client.SDKApp.GetSdkSettings"] = "Wczytaj ustawienia SDK",
                     ["RSDK.Client.SDKApp.SaveSdkSettings"] = "Zapisz ustawienia SDK",
+
+                    // NewProject UI (labels, help text)
+                    ["RSDK.Client.NewProjectControl.ProjectType"] = "Typ projektu",
+                    ["RSDK.Client.NewProjectControl.ParentFolder"] = "Folder nadrzędny",
+                    ["RSDK.Client.NewProjectControl.ProjectName"] = "Nazwa projektu",
+                    ["RSDK.Client.NewProjectControl.NewProjectFolder"] = "Folder nowego projektu",
+                    ["RSDK.Client.NewProjectControl.FolderHelp"] = "Nowy folder o tej nazwie zostanie utworzony w folderze nadrzędnym.",
+                    ["RSDK.Client.NewProjectControl.ParentFolderNote"] = "Wyświetlany folder nadrzędny to domyślny folder SDK (zmień w panelu Ustawienia SDK).",
+
+                    // SDK settings UI
+                    ["RSDK.Client.SdkSettingsControl.Title"] = "Ustawienia SDK",
+                    ["RSDK.Client.SdkSettingsControl.DefaultNewProjectFolder"] = "Domyślny folder dla nowych projektów",
+                    ["RSDK.Client.SdkSettingsControl.HelpText"] = "Nowy projekt zostanie utworzony w tym folderze domyślnie (można zmienić w kontrolce Nowy projekt).",
+
+                    // Project creation UI
+                    ["RSDK.Client.ProjectCreateProgressControl.Title"] = "Tworzenie projektu",
+                    ["RSDK.Client.ProjectCreateProgressControl.Completed"] = "Tworzenie projektu zakończone pomyślnie.",
+                    ["RSDK.Client.ProjectCreateProgressControl.Details"] = "Szczegóły",
 
                     ["ERROR_FOLDER_EXISTS_0"] = "Folder '{0}' już istnieje. Wybierz inną nazwę projektu lub usuń istniejący folder.",
                     ["ERROR_DOTNET_NEW_FAILED_0"] = "'dotnet new' nie powiódł się: {0}",

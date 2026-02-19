@@ -1,19 +1,20 @@
 @using Revuo.Chat.Common
 
 @using Microsoft.AspNetCore.Components.Web
+@using System.Globalization
 
 @namespace RSDK.Client
 
 @inherits Revuo.Chat.Client.Base.Abstractions.BasePayloadControlThinClient<SdkSettings, SDKApp>
 
 <div class="revuo-control sdk-settings-control container p-3 border rounded mt-3 mb-3">
-  <h4 class="mb-3">SDK Settings</h4>
+  <h4 class="mb-3">@App.Translator.Format("RSDK.Client.SdkSettingsControl.Title")</h4>
 
   <div class="row mb-2">
-    <label class="col-sm-3 col-form-label">Default new project folder</label>
+    <label class="col-sm-3 col-form-label">@App.Translator.Format("RSDK.Client.SdkSettingsControl.DefaultNewProjectFolder")</label>
     <div class="col-sm-9">
       <input class="form-control" @bind="Payload.DefaultNewProjectFolder" @bind:event="oninput" />
-      <div class="form-text">A new project will be created in this folder by default (can be overridden in New Project control).</div>
+      <div class="form-text">@App.Translator.Format("RSDK.Client.SdkSettingsControl.HelpText")</div>
     </div>
   </div>
 
