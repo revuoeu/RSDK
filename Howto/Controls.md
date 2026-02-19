@@ -72,8 +72,13 @@ private async Task<ShowFooRequest> ShowFooManagement(IThinClientContext ctx) {
 ---
 
 ## 🌐 Translations
-- Add keys in `Translation{App}.resx` (e.g. `Foo.Client.FooApp.ShowFooManagement`).
-- Rebuild to regenerate `Translations{App}.Designer.cs`.
+- Add translation entries to the app's static translation set (`I18N.set`) — edit your app's `I18N` (for example `SDKTranslations.cs`). Use keys like `Foo.Client.FooApp.ShowFooManagement`.
+- The app uses `StaticTranslator(I18N.set)`, so update `I18N.set` and rebuild; no `.resx`/designer regeneration is required.
+- Quick example:
+```csharp
+// SDKTranslations.cs
+I18N.set.Translations["en-US"].Entries["Foo.Client.FooApp.ShowFooManagement"] = "Show Foo management";
+```
 
 ---
 

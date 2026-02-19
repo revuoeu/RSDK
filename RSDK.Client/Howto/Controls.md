@@ -8,7 +8,7 @@ Short reference for adding UI controls to your app — copyable steps, examples,
 - UI actions should load data in the *Client app* (not in GUI components).
 - For GUI projects that contain `.razor` controls, set the project SDK to `Microsoft.NET.Sdk.Razor` (i.e. `<Project Sdk="Microsoft.NET.Sdk.Razor">`).
 - Register every control in application Init (`this.AddControl<YourControl>()`).
-- Add translations in the Model `.resx` and rebuild to regenerate designer classes.
+
 
 ---
 
@@ -25,7 +25,7 @@ Short reference for adding UI controls to your app — copyable steps, examples,
 3. GUI component:
    - Create `.razor` + code‑behind (`.razor.cs`) and prefer splitting markup and C# into the two files; e.g. `NewProjectControl.razor` + `NewProjectControl.razor.cs`, `SdkSettingsControl.razor` + `SdkSettingsControl.razor.cs`. Ensure the code‑behind declares the base class `BasePayloadControlThinClient<...>` or add `@namespace RSDK.Client` in the `.razor` so the app type resolves.
    - Styling: use consistent vertical spacing on top-level control containers — **recommend `mt-4` and `mb-4`** (for example: `class="revuo-control ... mt-4 mb-4"`).
-   - Data loading & initialization: load data in the *Client app* (OnInit) and return it as the `Payload`. Controls should **not** perform application-level data loading; instead the control's `OnInitialized` / `OnInitializedAsync` should consume `Payload` (already populated) and copy values into local fields for binding. Example:
+   - Controls should **not** perform application-level data loading; instead the control's `OnInitialized` / `OnInitializedAsync` should consume `Payload` (already populated) and copy values into local fields for binding. Example:
 
 ```csharp
 protected override async Task OnInitializedAsync() {
@@ -34,10 +34,10 @@ protected override async Task OnInitializedAsync() {
 }
 ```
 
-   - Set `HasActions => true` to enable action discovery.
+   - Set `HasActions => true` to disable showing bottom actions.
    - Use `RunAction<TResponse>("ActionName", request)` and `ParentFrame.Show(...)` for navigation.
-4. Application Init: register the control with `this.AddControl<YourControl>()` and add translations.
-5. Test: render the control with `RenderRevuoComponent<...>(...)`.
+
+4. Test: render the control with `RenderRevuoComponent<...>(...)`.
 
 ---
 
@@ -72,8 +72,13 @@ private async Task<ShowFooRequest> ShowFooManagement(IThinClientContext ctx) {
 ---
 
 ## 🌐 Translations
-- Add keys in `Translation{App}.resx` (e.g. `Foo.Client.FooApp.ShowFooManagement`).
-- Rebuild to regenerate `Translations{App}.Designer.cs`.
+- Add translation entries to the app's static translation set (`I18N.set`) — edit your app's `I18N` (for example `SDKTranslations.cs`). Use keys like `Foo.Client.FooApp.ShowFooManagement`.
+- The app uses `StaticTranslator(I18N.set)`, so update `I18N.set` and rebuild;
+- Quick example:
+```csharp
+// SDKTranslations.cs
+I18N.set.Translations["en-US"].Entries["Foo.Client.FooApp.ShowFooManagement"] = "Show Foo management";
+```
 
 ---
 
@@ -96,7 +101,7 @@ Assert.Contains("FooManagement", cut.Markup);
 - For projects that contain `.razor` components, ensure the project SDK is `Microsoft.NET.Sdk.Razor` — otherwise Razor controls will not compile.
 - In `.razor` controls include the full namespace for the application type in the `@inherits` generic (or add `@namespace`) to avoid missing-type or ambiguous-type errors.
 - Load data in Client app actions — GUI only displays already-loaded payloads.
-- Keep `HasActions => true` when you want automatic action buttons.
+- Keep `HasActions => false` when you want automatic action buttons.
 - Use `AssemblyInformationalVersion`/`InformationalVersion` for build metadata — not for binding.
 - Unit test both action results and control rendering.
 
@@ -109,9 +114,9 @@ Assert.Contains("FooManagement", cut.Markup);
 - [ ] `.razor` control created and inherits `BasePayloadControl*` (ensure `@inherits` includes the app namespace or add `@namespace`)
 - [ ] `HasActions` set if needed
 - [ ] `services.AddControl<,>()` registration added
-- [ ] Translation keys added and designer regenerated
+- [ ] Translation keys added 
 - [ ] Unit test added
 
 ---
 
-If you want, I can create a ready template control (razor + code‑behind + IoC + test + resx) in a target app — tell me which app.
+
