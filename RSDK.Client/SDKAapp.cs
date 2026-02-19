@@ -52,21 +52,11 @@ public partial class SDKApp : BaseThinClientApp
             ProjectType = ProjectType.CSharp,
         };
 
-        try
-        {
-            // attempt to read stored default folder from device storage (key: sdk.defaultNewProjectFolder)
-            dynamic dctx = context;
-            var stored = await dctx.devicestorage.GetAsync<string>("sdk.defaultNewProjectFolder");
-            if (!string.IsNullOrWhiteSpace(stored))
-                response.ProjectPath = stored!;
-        }
-        catch
-        {
-            // ignore — fall back to user's Documents folder if nothing stored
-        }
-
-        if (string.IsNullOrWhiteSpace(response.ProjectPath))
-            response.ProjectPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        // attempt to read stored default folder from device storage (key: sdk.defaultNewProjectFolder)
+        var settings = await GetSdkSettings(context);
+        if (!string.IsNullOrWhiteSpace(settings?.DefaultNewProjectFolder))
+            response.ProjectPath = settings!.DefaultNewProjectFolder;
+    
 
         return response;
     }

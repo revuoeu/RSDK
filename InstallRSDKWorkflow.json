@@ -14,12 +14,6 @@
       "ApplicationName": "Installer.Client.InstallerApp",
       "ActionName": "ListApplications",
       "ContinueOnError": true
-    },
-    {
-      "Order": 3,
-      "ApplicationName": "RSDK.Client.SDKApp",
-      "ActionName": "SelectNewProjectType",
-      "ContinueOnError": true
     }
   ]
 }
