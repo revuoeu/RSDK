@@ -523,7 +523,7 @@ Thumbs.db
             }
 
             // 2) create application class that uses StaticTranslator and registers one control
-            var appTemplate = LoadTemplateFromAssembly("App.cs.tpl");
+            var appTemplate = LoadTemplateFromAssembly("App.tpl");
             var appCs = appTemplate!.Replace("{{ProjectName}}", projectName);
 
             File.WriteAllText(Path.Combine(projectPath, "App.cs"), appCs);
