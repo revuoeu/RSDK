@@ -18,7 +18,7 @@ public class {{ProjectName}}App : BaseThinClientApp
     {
         this.AddAction(Hello);
         
-        this.AddControl<HomeControl>();
+        this.AddControl<Component1>();
 
         return Task.CompletedTask;
     }
