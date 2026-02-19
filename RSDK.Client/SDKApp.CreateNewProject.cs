@@ -105,11 +105,25 @@ public partial class SDKApp
             : result.NewProjectRequest.ProjectName;
 
         result.SetStep(this.Translator, result.Culture, nameof(CreateNewProject_DotnetNew));
-        result.Percent = 25;
 
+        var rundotnetnew =  await RunCommand(result, projectPath, projectName, "dotnet", $"new razorclasslib -f net10.0 -n \"{projectName}\" -o .");
+        if(rundotnetnew.IsError())
+            return rundotnetnew;
+
+        var rundotnetpackageinstall =  await RunCommand(result, projectPath, projectName, "dotnet", $"package update");
+
+        return rundotnetpackageinstall;
+    }
+
+    private async Task<ProjectCreateProgress> RunCommand(ProjectCreateProgress result,
+        string projectPath, 
+        string projectName,
+        string command,
+        string args)
+    {
         try
         {
-            var psi = new System.Diagnostics.ProcessStartInfo("dotnet", $"new razorclasslib -n \"{projectName}\" -f net10.0 -o .")
+            var psi = new System.Diagnostics.ProcessStartInfo(command, args)
             {
                 WorkingDirectory = projectPath,
                 RedirectStandardOutput = true,
