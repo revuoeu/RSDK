@@ -75,6 +75,8 @@ public partial class SDKApp
                 return stepResult!;
         }
         
+        stepResult.IsCompleted = true;
+
         return stepResult!;
     }
 
@@ -273,16 +275,6 @@ public partial class SDKApp
 
         try
         {
-            // helper: load text templates embedded under the `Templates` folder in the assembly
-            static string? LoadTemplateFromAssembly(string name)
-            {
-                var asm = typeof(SDKApp).Assembly;
-                var rn = asm.GetManifestResourceNames().FirstOrDefault(n => n.EndsWith($".Templates.{name}", StringComparison.OrdinalIgnoreCase));
-                if (rn == null) return null;
-                using var rs = asm.GetManifestResourceStream(rn)!;
-                using var sr = new StreamReader(rs);
-                return sr.ReadToEnd();
-            }
             var projectPath = result.NewProjectRequest.ProjectPath;
             var projectName = string.IsNullOrWhiteSpace(result.NewProjectRequest.ProjectName)
                 ? Path.GetFileName(projectPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))
@@ -293,53 +285,23 @@ public partial class SDKApp
             Directory.CreateDirectory(ghDir);
             var ghWorkflowPath = Path.Combine(ghDir, "ci.yml");
             var ghTemplate = LoadTemplateFromAssembly("ci.yml.tpl");
-            var ghWorkflow = !string.IsNullOrEmpty(ghTemplate)
-                ? ghTemplate
-                : $@"name: .NET CI
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-      - name: Restore
-        run: dotnet restore
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
-";
+            var ghWorkflow = ghTemplate;
 
             File.WriteAllText(ghWorkflowPath, ghWorkflow);
             result.Log.Add($"Created GitHub workflow: {Path.GetRelativePath(projectPath, ghWorkflowPath)}");
-            result.Percent = 70;
+
 
             // --- b) VSCode launch + tasks ---
             var vsDir = Path.Combine(projectPath, ".vscode");
             Directory.CreateDirectory(vsDir);
-
             var tasksTemplate = LoadTemplateFromAssembly("tasks.json.tpl");
             var tasksText = tasksTemplate.Replace("{{ProjectName}}", projectName);
-                
-
             File.WriteAllText(Path.Combine(vsDir, "tasks.json"), tasksText);
 
             var launchTemplate = LoadTemplateFromAssembly("launch.json.tpl");
-            var launchText =
-                 launchTemplate.Replace("{{ProjectName}}", projectName);
-                
-
+            var launchText = launchTemplate.Replace("{{ProjectName}}", projectName);
             File.WriteAllText(Path.Combine(vsDir, "launch.json"), launchText);
             result.Log.Add("Created VSCode settings: .vscode/launch.json + .vscode/tasks.json");
-            result.Percent = 80;
 
             // --- c) Revuo installation / workflow files ---
             var instRequest = new
@@ -358,28 +320,9 @@ jobs:
             File.WriteAllText(instPath, instJson);
 
             var workflowTemplate = LoadTemplateFromAssembly("InstallRSDKWorkflow.json.tpl");
-            string workflowJson;
-            if (!string.IsNullOrEmpty(workflowTemplate))
-            {
-                // insert JSON-escaped absolute path for installation request
-                workflowJson = workflowTemplate.Replace("{{InstallationRequestPathJson}}", System.Text.Json.JsonSerializer.Serialize(instPath));
-            }
-            else
-            {
-                var workflow = new
-                {
-                    Name = "Install application from dll",
-                    Description = "Install application, check if it is visible on list and run some action.",
-                    Steps = new object[]
-                    {
-                        new { Order = 1, ApplicationName = "Installer.Client.InstallerApp", ActionName = "InstallFromDll", ParameterFilePath = instPath, ContinueOnError = true },
-                        new { Order = 2, ApplicationName = "Installer.Client.InstallerApp", ActionName = "ListApplications", ParameterFilePath = (string?)null, ContinueOnError = true },
-                        new { Order = 3, ApplicationName = "RSDK.Client.SDKApp", ActionName = "SelectNewProjectType", ParameterFilePath = (string?)null, ContinueOnError = true }
-                    }
-                };
-
-                workflowJson = System.Text.Json.JsonSerializer.Serialize(workflow, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
-            }
+            string workflowJson = workflowTemplate.Replace("{{InstallationRequestPathJson}}", 
+                System.Text.Json.JsonSerializer.Serialize(instPath));
+            
 
             var workflowPath = Path.Combine(projectPath, "InstallRSDKWorkflow.json");
             File.WriteAllText(workflowPath, workflowJson);
@@ -393,6 +336,16 @@ jobs:
             result.WithError(this.Translator, result.Culture, "ERROR_CREATE_FILES_0", ex.Message);
             return result;
         }
+    }
+
+    private static string? LoadTemplateFromAssembly(string name)
+    {
+        var asm = typeof(SDKApp).Assembly;
+        var rn = asm.GetManifestResourceNames().FirstOrDefault(n => n.EndsWith($".Templates.{name}", StringComparison.OrdinalIgnoreCase));
+        if (rn == null) return null;
+        using var rs = asm.GetManifestResourceStream(rn)!;
+        using var sr = new StreamReader(rs);
+        return sr.ReadToEnd();
     }
 
     private async Task<ProjectCreateProgress> CreateNewProject_CreateReadme(IThinClientContext context, ProjectCreateProgress result)
@@ -570,28 +523,9 @@ Thumbs.db
             }
 
             // 2) create application class that uses StaticTranslator and registers one control
-            var appCs = $@"using Revuo.Chat.Abstraction.Client;
-using Revuo.Chat.Base;
-using Revuo.Chat.Client.Base.Abstractions;
-using Revuo.Chat.Base.I18N;
-using System.Threading.Tasks;
+            var appTemplate = LoadTemplateFromAssembly("App.cs.tpl");
+            var appCs = appTemplate!.Replace("{{ProjectName}}", projectName);
 
-namespace {projectName};
-
-public class {projectName}App : BaseThinClientApp
-{{
-    public {projectName}App() : base(new StaticTranslator(I18N.set))
-    {{
-    }}
-
-    protected override Task OnInit()
-    {{
-        // register a simple control
-        this.AddControl<HomeControl>();
-        return Task.CompletedTask;
-    }}
-}}
-";
             File.WriteAllText(Path.Combine(projectPath, "App.cs"), appCs);
             result.Log.Add("Created App.cs (basic Revuo app)");
 
@@ -621,12 +555,13 @@ public static class I18N
             result.Log.Add("Created I18N.cs (translations)");
 
             // 4) add a simple control (razor)
-            var controlRazor = $"@namespace {projectName}\n\n@using Microsoft.AspNetCore.Components.Web\n\n@inherits Revuo.Chat.Client.Base.Abstractions.BasePayloadControlThinClient<NewProjectResponse, {projectName}App>\n\n<div class=\"container mt-4 mb-4\">\n  <h4>Hello from {projectName}</h4>\n  <div class=\"mb-2\">This template includes a simple control and StaticTranslator-based translations.</div>\n</div>\n";
-            File.WriteAllText(Path.Combine(projectPath, "HomeControl.razor"), controlRazor);
-            result.Log.Add("Created HomeControl.razor");
+            var componentFile = Path.Combine(projectPath, "Component1.razor");
+            var componenetTemplate = LoadTemplateFromAssembly("Componenet1.razor.tpl");
+            
+            File.WriteAllText(componentFile, componenetTemplate.Replace("{{ProjectName}}", projectName));
+            result.Log.Add($"Created Component1.razor: {Path.GetRelativePath(projectPath, componentFile)}");
 
-            result.Percent = 100;
-            result.IsCompleted = true;
+            
             return result;
         }
         catch (Exception ex)
