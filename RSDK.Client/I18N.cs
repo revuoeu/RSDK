@@ -84,7 +84,7 @@ public static class I18N
                     ["RSDK.Client.SDKApp.NewProject"] = "Nowy projekt",
                     ["RSDK.Client.SDKApp.CreateNewProject"] = "Utwórz nowy projekt",
                     ["RSDK.Client.SDKApp.CreateNewProject_CreateFolder"] = "Tworzenie folderu projektu",
-                    ["RSDK.Client.SDKApp.CreateNewProject_DotnetNew"] = "Uruchamianie 'dotnet new' w celu utworzenia projektu..."
+                    ["RSDK.Client.SDKApp.CreateNewProject_DotnetNew"] = "Uruchamianie 'dotnet new' w celu utworzenia projektu...",
                     ["RSDK.Client.SDKApp.CreateNewProject_CopyHowtos"] = "Kopiowanie plików instrukcji (how‑to)...",
                     ["RSDK.Client.SDKApp.CreateNewProject_CreateSpecificFiles"] = "Tworzenie plików specyficznych dla projektu...",
                     ["RSDK.Client.SDKApp.CreateNewProject_CreateReadme"] = "Tworzenie pliku README...",
