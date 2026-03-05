@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using System.IO;
+using Revuo.Chat.Abstraction;
+using RSDK.Client.Model;
 
 namespace RSDK.Client;
 
@@ -38,7 +40,14 @@ public partial class SDKApp : BaseThinClientApp
         this.AddControl<SdkSettingsControl>();
         this.AddControl<ProjectCreateProgressControl>();
 
+        this.AddAction(MyApplications)
+
         return Task.CompletedTask;
+    }
+
+    private async Task<ApplicationList> MyApplications(IThinClientContext context)
+    {
+        throw new NotImplementedException();
     }
 
     // CreateNewProject* methods moved to `SDKApp.CreateNewProject.cs` (partial)

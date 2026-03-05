@@ -2,6 +2,8 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
+using RSDK.Client.Model;
+
 namespace RSDK.Client
 {
     public partial class NewProjectControl

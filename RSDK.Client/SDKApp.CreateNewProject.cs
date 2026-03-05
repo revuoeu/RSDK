@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System;
 using System.Threading.Tasks;
+using RSDK.Client.Model;
 
 namespace RSDK.Client;
 

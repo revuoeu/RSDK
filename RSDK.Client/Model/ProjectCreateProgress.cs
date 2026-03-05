@@ -1,6 +1,6 @@
 using Revuo.Chat.Abstraction.Base;
 
-namespace RSDK.Client;
+namespace RSDK.Client.Model;
 
 public class ProjectCreateProgress : BasePayloadWithError
 {

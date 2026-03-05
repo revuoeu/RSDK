@@ -1,3 +1,5 @@
+using RSDK.Client.Model;
+
 namespace RSDK.Client
 {
     public partial class ProjectCreateProgressControl
