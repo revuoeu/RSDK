@@ -53,6 +53,15 @@ public static class I18N
                     ["RSDK.Client.ProjectCreateProgressControl.Completed"] = "Project creation completed successfully.",
                     ["RSDK.Client.ProjectCreateProgressControl.Details"] = "Details",
 
+                    // List projects UI
+                    ["RSDK.Client.ListProjectsInFolderControl.Title"] = "Projects in folder",
+                    ["RSDK.Client.ListProjectsInFolderControl.Description"] = "Shows all detected projects found under the current default project folder.",
+                    ["RSDK.Client.ListProjectsInFolderControl.Refresh"] = "Refresh",
+                    ["RSDK.Client.ListProjectsInFolderControl.None"] = "No projects were found.",
+                    ["RSDK.Client.ListProjectsInFolderControl.Name"] = "Name",
+                    ["RSDK.Client.ListProjectsInFolderControl.Type"] = "Type",
+                    ["RSDK.Client.ListProjectsInFolderControl.Path"] = "Path",
+
                     ["ERROR_FOLDER_EXISTS_0"] = "Folder '{0}' already exists. Please choose a different project name or delete the existing folder.",
                     ["ERROR_DOTNET_NEW_FAILED_0"] = "'dotnet new' failed: {0}",
                     ["ERROR_EXCEPTION_0"] = "Unexpected error: {0}",
@@ -111,6 +120,15 @@ public static class I18N
                     ["RSDK.Client.ProjectCreateProgressControl.Title"] = "Tworzenie projektu",
                     ["RSDK.Client.ProjectCreateProgressControl.Completed"] = "Tworzenie projektu zakończone pomyślnie.",
                     ["RSDK.Client.ProjectCreateProgressControl.Details"] = "Szczegóły",
+
+                    // List projects UI
+                    ["RSDK.Client.ListProjectsInFolderControl.Title"] = "Projekty w folderze",
+                    ["RSDK.Client.ListProjectsInFolderControl.Description"] = "Pokaż wszystkie wykryte projekty znajdujące się w domyślnym folderze projektów.",
+                    ["RSDK.Client.ListProjectsInFolderControl.Refresh"] = "Odśwież",
+                    ["RSDK.Client.ListProjectsInFolderControl.None"] = "Nie znaleziono żadnych projektów.",
+                    ["RSDK.Client.ListProjectsInFolderControl.Name"] = "Nazwa",
+                    ["RSDK.Client.ListProjectsInFolderControl.Type"] = "Typ",
+                    ["RSDK.Client.ListProjectsInFolderControl.Path"] = "Ścieżka",
 
                     ["ERROR_FOLDER_EXISTS_0"] = "Folder '{0}' już istnieje. Wybierz inną nazwę projektu lub usuń istniejący folder.",
                     ["ERROR_DOTNET_NEW_FAILED_0"] = "'dotnet new' nie powiódł się: {0}",

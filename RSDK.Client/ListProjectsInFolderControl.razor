@@ -1,0 +1,50 @@
+@namespace RSDK.Client
+
+@using Revuo.Chat.Abstraction.Extensions
+@using RSDK.Client.Model
+
+@inherits Revuo.Chat.Client.Base.Abstractions.BasePayloadControlThinClient<FolderContent, SDKApp>
+
+<div class="revuo-control list-projects-in-folder container p-3 border rounded mt-3 mb-3">
+  <h4 class="mb-3">@App.Translator.Format("RSDK.Client.ListProjectsInFolderControl.Title")</h4>
+
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <div class="text-muted">
+      @App.Translator.Format("RSDK.Client.ListProjectsInFolderControl.Description")
+    </div>
+    <button class="btn btn-sm btn-secondary" @onclick="Refresh">
+      @App.Translator.Format("RSDK.Client.ListProjectsInFolderControl.Refresh")
+    </button>
+  </div>
+
+  @if (Payload?.D == null || Payload.D.Count == 0)
+  {
+    <div class="alert alert-info mb-0">
+      @App.Translator.Format("RSDK.Client.ListProjectsInFolderControl.None")
+    </div>
+  }
+  else
+  {
+    <div class="table-responsive">
+      <table class="table table-sm table-striped mb-0">
+        <thead>
+          <tr>
+            <th>@App.Translator.Format("RSDK.Client.ListProjectsInFolderControl.Name")</th>
+            <th>@App.Translator.Format("RSDK.Client.ListProjectsInFolderControl.Type")</th>
+            <th>@App.Translator.Format("RSDK.Client.ListProjectsInFolderControl.Path")</th>
+          </tr>
+        </thead>
+        <tbody>
+          @foreach (var folder in Payload.D)
+          {
+            <tr>
+              <td>@folder.Name</td>
+              <td>@folder.Type</td>
+              <td class="text-truncate" title="@folder.Path">@folder.Path</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

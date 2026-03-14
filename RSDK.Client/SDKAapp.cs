@@ -43,13 +43,14 @@ public partial class SDKApp : BaseThinClientApp
 
         this.AddControl<SdkSettingsControl>();
         this.AddControl<ProjectCreateProgressControl>();
+        this.AddControl<ListProjectsInFolderControl>();
 
         this.AddAction(MyApplications);
 
         return Task.CompletedTask;
     }
 
-    private async Task<FolderContent> ListProjectsInFolder(IThinClientContext context)
+    public async Task<FolderContent> ListProjectsInFolder(IThinClientContext context)
     {
         // get path from settings
         // list all folder in that path
