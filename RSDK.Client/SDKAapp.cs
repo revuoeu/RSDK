@@ -40,19 +40,37 @@ public partial class SDKApp : BaseThinClientApp
         this.AddControl<SdkSettingsControl>();
         this.AddControl<ProjectCreateProgressControl>();
 
-        this.AddAction(MyApplications)
+        this.AddAction(MyApplications);
 
         return Task.CompletedTask;
     }
 
     private async Task<ApplicationList> MyApplications(IThinClientContext context)
     {
-        throw new NotImplementedException();
+        // let's ask server for the list of applications (projects) we have created
+        // we can go trhough installer app so we will run local actions agains installer
+        // it should be able to mange projects and approvals and evrything
+
+        // let's maintain complete list of all application in github
+        // those will have link to the github projects
+
+        // this list will have ID if it's registered in app manager
+        // no id then not public
+        // 
+        // if we add app to this list we can install and share with others
+        // we can apply for approval (with version of the artifact)
+        // we will handle storage types registartion
+        // request for starage can be separted
+        // 
+
+        var list = await context.RunAction("AppManager.Client.AppManagerApp", "ListApps", null);
+
+        return null;
     }
 
     // CreateNewProject* methods moved to `SDKApp.CreateNewProject.cs` (partial)
 
-
+    
 
     private async Task<NewProjectResponse> NewProject(IThinClientContext context)
     {
