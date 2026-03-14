@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using Revuo.Chat.Abstraction;
 using RSDK.Client.Model;
+using Revuo.Chat.Abstraction.Base;
 
 namespace RSDK.Client;
 
@@ -37,12 +38,49 @@ public partial class SDKApp : BaseThinClientApp
         // SDK settings (default folder for new projects)
         this.AddAction<SdkSettings>(GetSdkSettings);
         this.AddAction<SdkSettings>(SaveSdkSettings);
+        this.AddAction<FolderContent>(ListProjectsInFolder);
+
+
         this.AddControl<SdkSettingsControl>();
         this.AddControl<ProjectCreateProgressControl>();
 
         this.AddAction(MyApplications);
 
         return Task.CompletedTask;
+    }
+
+    private async Task<FolderContent> ListProjectsInFolder(IThinClientContext context)
+    {
+        // get path from settings
+        // list all folder in that path
+        var settings = await GetSdkSettings(context);
+        var path = settings.DefaultNewProjectFolder;
+        var folders = new List<ProjectFolder>();
+        if (Directory.Exists(path))
+        {
+            var dirs = Directory.GetDirectories(path);
+
+            foreach (var d in dirs)
+            {
+                var project = new ProjectFolder
+                {
+                    Name = Path.GetFileName(d),
+                    Path = d
+                };
+
+                // check if this is a dotnet project (contains .csproj or .sln file)
+                var files = Directory.GetFiles(d);
+                if (files.Any(f => f.EndsWith(".csproj") || f.EndsWith(".sln")))
+                    project.Type = ProjectType.CSharp;
+                
+                folders.Add(project);
+            }
+        }
+
+        return new FolderContent
+        {
+            D = folders
+        };
     }
 
     private async Task<ApplicationList> MyApplications(IThinClientContext context)
@@ -70,7 +108,7 @@ public partial class SDKApp : BaseThinClientApp
 
     // CreateNewProject* methods moved to `SDKApp.CreateNewProject.cs` (partial)
 
-    
+
 
     private async Task<NewProjectResponse> NewProject(IThinClientContext context)
     {
@@ -105,4 +143,16 @@ public partial class SDKApp : BaseThinClientApp
         await context.DeviceStorage!.Store(request);
         return request;
     }
+}
+
+public class FolderContent : BasePayload<List<ProjectFolder>>
+{
+}
+
+public class ProjectFolder
+{
+    public string Name { get; set; } = "";
+    public string Path { get; set; } = "";
+
+    public ProjectType Type { get; set; } = ProjectType.Unkown;
 }
