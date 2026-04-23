@@ -53,8 +53,8 @@ class SettingsData : BaseEntity
 
 var stored = await ctx.DeviceStorage.Get<SettingsData>(SettingsData.Key);
 //storing
-req.ID = SettingsData.Key;
-await ctx.DeviceStorage.Store<SettingsData>(req.D);
+req.Id = SettingsData.Key;
+await ctx.DeviceStorage.Store(req);
 ```
 
 
@@ -67,6 +67,26 @@ var resp = await context.RunAction<TResponse>("ActionName", payload);
 ```
 
 Actions without request payloads are invoked with `null`.
+
+```csharp
+var response = await context.RunAction<MyResponse>("GetContacts", null);
+```
+
+## Error handling
+
+If an action throws an exception, the framework catches it and handles it according to the Revuo error flow (exposed in the UI frame and developer console). 
+
+For more structured handling, preferred approach is to return `BasePayloadWithErrors<T>` and include localized error information. This allows you to use translated messages in the UI and avoid throwing for standard business errors.
+
+Example payload with errors:
+
+```csharp
+public class SaveContactResponse : BasePayloadWithErrors<Contact>
+{
+}
+```
+
+Then in UI, inspect `Payload?.Errors` and show localized errors to the user.
 
 ## Stateless YouTube Client Helper
 

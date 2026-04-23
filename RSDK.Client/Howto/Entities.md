@@ -6,6 +6,14 @@
 - **UI Entities**: inherit from `IPayload` when they need to flow through the Revuo framework.
 - **Storable Entities**: enetities that can be stored in `DeviceStorage` or `ApplicationStorage` should inherit from `IEntity` which includes an `Id` property. There are helper base classes like `BasePayloadEntity` that combine both concepts for convenience.
 
+## Generating IDs
+
+When you need a new entity ID, always use `IdProvider.Get()` — do **not** use `Guid.NewGuid().ToString()` directly:
+
+```csharp
+var contact = new Contact { Id = IdProvider.Get(), ... };
+```
+
 
 ```csharp
 public class ShowChannelsResponse : BasePayload<List<Channel>> { }

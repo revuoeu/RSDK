@@ -24,18 +24,45 @@ Controls will have typed Payload property populated. No need to load it. It will
 
 - **RunAction**: invoke actions from within a control.
 - **ParentFrame.Show(payload)**: navigate to another control with a payload.
-- **HasActions**: override to hide automatic action bar.
+- **HasActions**: override to control whether the automatic action bar is rendered (see below).
 - **DialogService**: injected service for displaying dialogs.
 
 ### Automatic action buttons
 
-When a control's payload type matches the request type of a registered action, Revuo will automatically display that action as a button in the action bar at the bottom.  For example, if the control is `BasePayloadControlThinClient<ShowChannelsResponse, YourApp>` and the app registers
+Revuo can automatically render action buttons in the action bar at the bottom of a control — **but only for actions that take no arguments** (registered with `AddAction(method)`, no `TReq` type parameter).
 
+If an action requires a request argument (`AddAction<TReq, TResp>(method)`), the framework has no way to know what value to pass, so **no automatic button is shown**. Those actions must be wired manually in the control's markup.
+
+Example — automatic button (no argument):
 ```csharp
-AddAction<ShowChannelsResponse, ShowChannelsResponse>(SaveChannels);
+AddAction(GetCampaigns);  // button appears automatically
 ```
 
-then the UI will render a "SaveChannels" button without you having to add it manually in the markup.  This is the preferred pattern for operations that operate on the current entity (such as saving a list or editing an item).
+Example — no automatic button (has argument):
+```csharp
+AddAction<CampaignActionRequest, CampaignListResponse>(StartCampaign);  // must wire manually
+```
+
+### Controlling the action bar with `HasActions`
+
+The base class exposes a virtual `HasActions` property that defaults to `true`. Revuo uses it to decide whether to render the automatic action bar at all.
+
+**Default (action bar visible):**  
+Do nothing — the framework renders automatic buttons for any no-argument actions whose return type matches the control's payload type.
+
+**Suppress the action bar entirely:**  
+Override and return `false` when the control manages all its own buttons inline (e.g. per-row actions in a list view):
+
+```csharp
+public override bool HasActions => false;
+```
+
+Use this when:
+- All actions require arguments (so no auto-buttons would appear anyway) and you don't want the empty action bar rendered.
+- The control has buttons on individual rows (edit, start, stop, poll…) rather than a single global action.
+- You want full control over button placement and visibility logic.
+
+`CampaignListView` is an example: it overrides `HasActions => false` because all its actions take a `CampaignActionRequest` (the campaign ID) and are rendered inline per row.
 
 ### Adding new items (e.g. channels)
 
