@@ -43,9 +43,11 @@ Use this workflow when adding a new feature to an RSDK app.
 
 ## 6. Test it
 
-- add action-level unit tests
-- add control render tests with bUnit if the test project already includes it
-- use FakeItEasy for dependencies if it is already part of the repo test stack
+- the SDK scaffolds a `{ProjectName}.Test` project automatically — open it and start writing tests there
+- add action-level unit tests for business logic (storage reads/writes, auth checks, payload mapping)
+- add plain model tests for payloads, stores, and helpers — no DI needed, fast to run
+- add control render tests with bUnit when visual behavior matters
+- use FakeItEasy for faking dependencies
 - instantiate a control class directly when you only need to test code-behind behavior
 
 See `Testing.md` for concrete examples.

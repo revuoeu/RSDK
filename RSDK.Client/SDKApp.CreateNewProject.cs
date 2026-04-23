@@ -44,7 +44,7 @@ public partial class SDKApp
             nameof(CreateNewProject_CreateSolution),
             nameof(CreateNewProject_CreateGitIgnore),
             nameof(CreateNewProject_CreateRevuoApp),
-            
+            nameof(CreateNewProject_CreateTestProject),
         };
 
         var stepResult = new ProjectCreateProgress();
@@ -568,6 +568,55 @@ public static class I18N
         catch (Exception ex)
         {
             result.WithError(this.Translator, result.Culture, "ERROR_CREATE_REVUOAPP_0", ex.Message);
+            return result;
+        }
+    }
+
+    private async Task<ProjectCreateProgress> CreateNewProject_CreateTestProject(IThinClientContext context, ProjectCreateProgress result)
+    {
+        result.SetStep(this.Translator, result.Culture, nameof(CreateNewProject_CreateTestProject));
+        result.Percent = Math.Max(result.Percent, 99);
+
+        try
+        {
+            var projectPath = result.NewProjectRequest.ProjectPath;
+            var projectName = string.IsNullOrWhiteSpace(result.NewProjectRequest.ProjectName)
+                ? Path.GetFileName(projectPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))
+                : result.NewProjectRequest.ProjectName;
+
+            var testProjectName = $"{projectName}.Test";
+            var testProjectDir = Path.Combine(projectPath, testProjectName);
+            Directory.CreateDirectory(testProjectDir);
+
+            // write the .csproj from template
+            var csprojTemplate = LoadTemplateFromAssembly("TestProject.csproj.tpl");
+            var csproj = csprojTemplate!.Replace("{{ProjectName}}", projectName);
+            File.WriteAllText(Path.Combine(testProjectDir, testProjectName + ".csproj"), csproj);
+            result.Log.Add($"Created test project file: {testProjectName}.csproj");
+
+            // write the starter test file from template
+            var testTemplate = LoadTemplateFromAssembly("TestUnitTest.cs.tpl");
+            var testFile = testTemplate!.Replace("{{ProjectName}}", projectName);
+            File.WriteAllText(Path.Combine(testProjectDir, "UnitTest1.cs"), testFile);
+            result.Log.Add("Created starter test: UnitTest1.cs");
+
+            // add the test project to the solution
+            var slnFile = Directory.GetFiles(projectPath, "*.sln").FirstOrDefault()
+                       ?? Directory.GetFiles(projectPath, "*.slnx").FirstOrDefault();
+            if (slnFile != null)
+            {
+                var addResult = await RunCommand(result, projectPath, projectName,
+                    "dotnet", $"sln add \"{Path.Combine(testProjectName, testProjectName + ".csproj")}\"");
+                if (addResult.IsError())
+                    return addResult;
+                result.Log.Add($"Added {testProjectName} to solution");
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            result.WithError(this.Translator, result.Culture, "ERROR_CREATE_TEST_PROJECT_0", ex.Message);
             return result;
         }
     }

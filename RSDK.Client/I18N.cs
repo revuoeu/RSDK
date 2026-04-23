@@ -22,6 +22,7 @@ public static class I18N
                     ["CreateNewProject_CreateSolution"] = "Creating solution and adding projects...",
                     ["CreateNewProject_CreateGitIgnore"] = "Creating .gitignore...",
                     ["CreateNewProject_CreateRevuoApp"] = "Adding Revuo app files...",
+                    ["CreateNewProject_CreateTestProject"] = "Creating test project...",
                     ["RSDK.Client.SDKApp"] = "Revuo Software Development Kit",                    ["RSDK.Client.SDKApp.NewProject"] = "New project",
                     ["RSDK.Client.SDKApp.CreateNewProject"] = "Create new project",
                     ["RSDK.Client.SDKApp.CreateNewProject_CreateFolder"] = "Creating project folder",
@@ -32,6 +33,7 @@ public static class I18N
                     ["RSDK.Client.SDKApp.CreateNewProject_CreateSolution"] = "Creating solution and adding projects...",
                     ["RSDK.Client.SDKApp.CreateNewProject_CreateGitIgnore"] = "Creating .gitignore...",
                     ["RSDK.Client.SDKApp.CreateNewProject_CreateRevuoApp"] = "Adding Revuo app files...",
+                    ["RSDK.Client.SDKApp.CreateNewProject_CreateTestProject"] = "Creating test project...",
                     ["RSDK.Client.SDKApp.GetSdkSettings"] = "Load SDK settings",
                     ["RSDK.Client.SDKApp.SaveSdkSettings"] = "Save SDK settings",
 
@@ -71,7 +73,8 @@ public static class I18N
                     ["ERROR_CREATE_SOLUTION_0"] = "Failed to create solution: {0}",
                     ["ERROR_ADD_PROJECT_TO_SOLUTION_0"] = "Failed to add project to solution: {0}",
                     ["ERROR_CREATE_GITIGNORE_0"] = "Failed to create .gitignore: {0}",
-                    ["ERROR_CREATE_REVUOAPP_0"] = "Failed to create Revuo app: {0}"
+                    ["ERROR_CREATE_REVUOAPP_0"] = "Failed to create Revuo app: {0}",
+                    ["ERROR_CREATE_TEST_PROJECT_0"] = "Failed to create test project: {0}"
                 }
             },
 
@@ -88,6 +91,7 @@ public static class I18N
                     ["CreateNewProject_CreateSolution"] = "Tworzenie rozwiązania i dodawanie projektów...",
                     ["CreateNewProject_CreateGitIgnore"] = "Tworzenie pliku .gitignore...",
                     ["CreateNewProject_CreateRevuoApp"] = "Dodawanie plików aplikacji Revuo...",
+                    ["CreateNewProject_CreateTestProject"] = "Tworzenie projektu testów...",
 
                     ["RSDK.Client.SDKApp"] = "Zestaw narzędzi programistycznych Revuo",
                     ["RSDK.Client.SDKApp.NewProject"] = "Nowy projekt",
@@ -100,6 +104,7 @@ public static class I18N
                     ["RSDK.Client.SDKApp.CreateNewProject_CreateSolution"] = "Tworzenie rozwiązania i dodawanie projektów...",
                     ["RSDK.Client.SDKApp.CreateNewProject_CreateGitIgnore"] = "Tworzenie pliku .gitignore...",
                     ["RSDK.Client.SDKApp.CreateNewProject_CreateRevuoApp"] = "Dodawanie plików aplikacji Revuo...",
+                    ["RSDK.Client.SDKApp.CreateNewProject_CreateTestProject"] = "Tworzenie projektu testów...",
                     ["RSDK.Client.SDKApp.GetSdkSettings"] = "Wczytaj ustawienia SDK",
                     ["RSDK.Client.SDKApp.SaveSdkSettings"] = "Zapisz ustawienia SDK",
 
@@ -139,7 +144,8 @@ public static class I18N
                     ["ERROR_CREATE_SOLUTION_0"] = "Nie udało się utworzyć rozwiązania: {0}",
                     ["ERROR_ADD_PROJECT_TO_SOLUTION_0"] = "Nie udało się dodać projektu do rozwiązania: {0}",
                     ["ERROR_CREATE_GITIGNORE_0"] = "Nie udało się utworzyć .gitignore: {0}",
-                    ["ERROR_CREATE_REVUOAPP_0"] = "Nie udało się utworzyć aplikacji Revuo: {0}"
+                    ["ERROR_CREATE_REVUOAPP_0"] = "Nie udało się utworzyć aplikacji Revuo: {0}",
+                    ["ERROR_CREATE_TEST_PROJECT_0"] = "Nie udało się utworzyć projektu testów: {0}"
                 }
             }
         }

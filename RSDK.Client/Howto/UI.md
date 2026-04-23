@@ -94,4 +94,48 @@ For list screens:
 - call `ParentFrame.Show(updatedPayload)` or refresh after save
 - keep per-row actions near the row they affect
 
+### Inline add-item pattern
+
+A common approach is a local boolean flag that toggles an inline input form, avoiding the need to navigate away:
+
+```csharp
+// in the .razor.cs partial
+private bool _adding;
+private string _newItemName = "";
+
+private void StartAdd() => _adding = true;
+private void CancelAdd() { _adding = false; _newItemName = ""; }
+
+private async Task SaveNewItem()
+{
+    await RunAction<MyListPayload>("AddItem", new AddItemRequest { Name = _newItemName });
+    _adding = false;
+    _newItemName = "";
+}
+```
+
+```razor
+@if (_adding)
+{
+    <div class="input-group mb-3">
+        <input class="form-control" @bind="_newItemName"
+               placeholder="@Application?.Translator?["UI.NewItem.Placeholder"]" />
+        <button class="btn btn-primary" @onclick="SaveNewItem">
+            @Application?.Translator?["UI.Add"]
+        </button>
+        <button class="btn btn-outline-secondary" @onclick="CancelAdd">
+            @Application?.Translator?["UI.Cancel"]
+        </button>
+    </div>
+}
+else
+{
+    <button class="btn btn-sm btn-success mb-3" @onclick="StartAdd">
+        @Application?.Translator?["UI.Add"]
+    </button>
+}
+```
+
+The corresponding action takes the request and returns an updated payload the parent frame can display.
+
 See `Controls.md` for the full wiring checklist and `Testing.md` for test patterns.

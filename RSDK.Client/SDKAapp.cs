@@ -33,6 +33,7 @@ public partial class SDKApp : BaseThinClientApp
         this.AddAction<ProjectCreateProgress, ProjectCreateProgress>(CreateNewProject_CreateSolution);
         this.AddAction<ProjectCreateProgress, ProjectCreateProgress>(CreateNewProject_CreateGitIgnore);
         this.AddAction<ProjectCreateProgress, ProjectCreateProgress>(CreateNewProject_CreateRevuoApp);
+        this.AddAction<ProjectCreateProgress, ProjectCreateProgress>(CreateNewProject_CreateTestProject);
         this.AddControl<NewProjectControl>();
 
         // SDK settings (default folder for new projects)

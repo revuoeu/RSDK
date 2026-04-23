@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/RSDK.Client/">
     <Project Path="RSDK.Client/RSDK.Client.csproj" />
+    <Project Path="RSDK.Client.Test/RSDK.Client.Test.csproj" />
   </Folder>
 </Solution>
