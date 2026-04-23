@@ -1,99 +1,97 @@
-# User Interface (Controls)
+# User Interface
 
-This section explains how to build Blazor/Razor controls within the Revuo framework.
 
-## Base Classes
+This document explains how to build Blazor/Razor controls for RSDK apps.
 
-Controls usually inherit from `BasePayloadControlThinClient<TPayload, TApp>`. `TPayload` corresponds to the type returned by the action that navigates to the control.
+## Base class
+
+Controls typically inherit from `BasePayloadControlThinClient<TPayload, TApp>`.
 
 ```razor
-@inherits Revuo.Chat.Client.Base.Abstractions.BasePayloadControlThinClient<SettingsData, YourApp>
+@namespace RSDK.Client
+@inherits Revuo.Chat.Client.Base.Abstractions.BasePayloadControlThinClient<SettingsData, SDKApp>
 ```
 
-For simple entity editors the payload type can be the entity itself rather than a wrapper.
+- `TPayload` is the payload shown by the control.
+- For simple editors, the payload can be the entity itself.
 
-## Internationalization in Controls
+## General rules
 
-Use `Application?.Translator?["key"]` to look up translations. Translation keys are managed in `I18N.set`.
+- Load data in app actions, not in the control.
+- Treat `Payload` as already populated input for the view.
+- Prefer a split `.razor` + `.razor.cs` control.
+- Register each control in the app's `OnInit`.
+- Use Bootstrap classes for layout and spacing.
+- Prefer `mt-4 mb-4` on the top-level container.
+- Do not use separate CSS files for controls. Not supported yet.
 
-## Using Payloads
+## Translations
 
-Controls will have typed Payload property populated. No need to load it. It will be availble in this.Payload
+Use the translator exposed by the app or control:
 
-## Framework Capabilities
+```csharp
+var text = Application?.Translator?["SDK.App.ShowSettings"];
+```
 
-- **RunAction**: invoke actions from within a control.
-- **ParentFrame.Show(payload)**: navigate to another control with a payload.
-- **HasActions**: override to control whether the automatic action bar is rendered (see below).
-- **DialogService**: injected service for displaying dialogs.
+Some apps expose a shorthand translator property such as `Application?.T?["..."]`. Use the pattern already present in the project.
+
+## Actions from controls
+
+Useful capabilities exposed by the framework:
+
+- `RunAction` to invoke actions
+- `ParentFrame.Show(payload)` to navigate
+- `DialogService` for dialogs
+- `HasActions` to control the automatic action bar
 
 ### Automatic action buttons
 
-Revuo can automatically render action buttons in the action bar at the bottom of a control — **but only for actions that take no arguments** (registered with `AddAction(method)`, no `TReq` type parameter).
+Automatic bottom action buttons are intended for actions that do not need request arguments.
 
-If an action requires a request argument (`AddAction<TReq, TResp>(method)`), the framework has no way to know what value to pass, so **no automatic button is shown**. Those actions must be wired manually in the control's markup.
-
-Example — automatic button (no argument):
 ```csharp
-AddAction(GetCampaigns);  // button appears automatically
+AddAction(GetSettings);
 ```
 
-Example — no automatic button (has argument):
+If an action requires a request payload, wire the button manually in the markup and call `RunAction`.
+
 ```csharp
-AddAction<CampaignActionRequest, CampaignListResponse>(StartCampaign);  // must wire manually
+AddAction<SaveSettingsRequest, SaveSettingsResponse>(SaveSettings);
 ```
 
-### Controlling the action bar with `HasActions`
+### Hiding the automatic action bar
 
-The base class exposes a virtual `HasActions` property that defaults to `true`. Revuo uses it to decide whether to render the automatic action bar at all.
-
-**Default (action bar visible):**  
-Do nothing — the framework renders automatic buttons for any no-argument actions whose return type matches the control's payload type.
-
-**Suppress the action bar entirely:**  
-Override and return `false` when the control manages all its own buttons inline (e.g. per-row actions in a list view):
+Override `HasActions` and return `false` when the control owns all button rendering itself.
 
 ```csharp
 public override bool HasActions => false;
 ```
 
-Use this when:
-- All actions require arguments (so no auto-buttons would appear anyway) and you don't want the empty action bar rendered.
-- The control has buttons on individual rows (edit, start, stop, poll…) rather than a single global action.
-- You want full control over button placement and visibility logic.
+Use this for row-level actions, inline editors, or screens where the default bottom bar is not useful.
 
-`CampaignListView` is an example: it overrides `HasActions => false` because all its actions take a `CampaignActionRequest` (the campaign ID) and are rendered inline per row.
+## Typical pattern
 
-### Adding new items (e.g. channels)
+Copy payload values into local fields in `OnInitializedAsync` and bind the UI to those fields.
 
-For collection editors you will often want a button or form at the top of the view to create a new element.  `ChannelListView` demonstrates one approach:
-
-```razor
-@if (addingChannel)
+```csharp
+protected override async Task OnInitializedAsync()
 {
-    <div class="input-group mb-3">
-        <input class="form-control" @bind="newChannelName" placeholder="@Application?.Translator["UI.AddChannel.Placeholder"]" />
-        <button class="btn btn-primary" @onclick="SaveNewChannel">@Application?.Translator["UI.AddChannel"]</button>
-        <button class="btn btn-outline-secondary" @onclick="CancelAddChannel">@Application?.Translator["UI.Cancel"]</button>
-    </div>
-}
-else
-{
-    <button class="btn btn-sm btn-success mb-3" @onclick="StartAddChannel">
-        @Application?.Translator["UI.AddChannel"]
-    </button>
+    if (Payload is not null)
+    {
+        Name = Payload.Name;
+        Items = Payload.Items;
+    }
+
+    await base.OnInitializedAsync();
 }
 ```
 
-The action itself is registered in the app (`AddAction<AddChannelRequest, ShowChannelsResponse>(AddChannel)`) and invoked via `RunAction`, returning an updated channel list which the parent frame can display.  Translate the button text using the usual `Application?.Translator["…"]` key lookup.
+## Collections
 
-Layout and styling use Bootstrap classes (`container`, `form-control`, `btn`, etc.).
+For list screens:
 
-Controls are registered in your application class's `OnInit` method.
+- render add/edit/delete controls inline
+- use `RunAction` for mutations
+- call `ParentFrame.Show(updatedPayload)` or refresh after save
+- keep per-row actions near the row they affect
 
-### Editing collections
-
-When a control renders a list (e.g. channels containing playlists) you often want per-item operations such as rename, delete, or add/remove sub-items. Render extra buttons or icons next to each element and call corresponding actions with `RunAction`.
-
-### Guidelines
-Prefered way to create control is to split markup and codebehind into separeted razor.cs files.
+See `Controls.md` for the full wiring checklist and `Testing.md` for test patterns.

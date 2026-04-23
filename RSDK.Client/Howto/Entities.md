@@ -1,28 +1,54 @@
-# Payloads & Entities
+# Payloads and Entities
 
-- **Payloads**: use `BasePayload<T>` for request/response messages.
-  All action result or paramters implements IPayload. There are base class helper to use: BasePayload<T>, BasePayloadWithErrors<T>.
+Use payloads for transport through the framework and entities for persistent records.
 
-- **UI Entities**: inherit from `IPayload` when they need to flow through the Revuo framework.
-- **Storable Entities**: enetities that can be stored in `DeviceStorage` or `ApplicationStorage` should inherit from `IEntity` which includes an `Id` property. There are helper base classes like `BasePayloadEntity` that combine both concepts for convenience.
+## Payloads
 
-## Generating IDs
+Use payloads for action requests and responses.
 
-When you need a new entity ID, always use `IdProvider.Get()` — do **not** use `Guid.NewGuid().ToString()` directly:
-
-```csharp
-var contact = new Contact { Id = IdProvider.Get(), ... };
-```
-
+- `BasePayload<T>` for normal payloads
+- `BasePayloadWithErrors<T>` when the response may include validation or business errors
 
 ```csharp
 public class ShowChannelsResponse : BasePayload<List<Channel>> { }
-public class SettingsData : BasePayloadEntity { public string YouTubeApiKey { get; set; } }
 ```
 
-Use the *entity-edit* pattern (no request payload) for simple screens like settings:
+## Entities
+
+- Use `IEntity` for storable records.
+- Use `BasePayloadEntity` when the same type needs both payload behavior and an `Id`.
+
+```csharp
+public class SettingsData : BasePayloadEntity
+{
+    public string? ApiKey { get; set; }
+}
+```
+
+## IDs
+
+Use `IdProvider.Get()` for new IDs instead of `Guid.NewGuid().ToString()`.
+
+```csharp
+var contact = new Contact
+{
+    Id = IdProvider.Get()
+};
+```
+
+For singleton-like records, use a fixed key instead of generating a new ID every time.
+
+## Simple editor pattern
+
+For settings and similar screens, a parameterless action that returns the entity is often enough.
 
 ```csharp
 AddAction(GetSettings);
-public async Task<SettingsData> GetSettings(IThinClientContext ctx) { ... }
+
+public async Task<SettingsData> GetSettings(IThinClientContext context)
+{
+    // load and return the entity
+}
 ```
+
+That lets the control work directly with the returned entity payload.

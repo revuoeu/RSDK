@@ -1,48 +1,56 @@
-# Storage Access
+# Storage
 
-This document describes the recommended pattern for accessing storage in a Revuo app.
+**Sources:** `RSDK.Client\Howto\Storage.md`, `DalleR\Howto\Storage.md`
 
-## Storage choice
+This document describes the recommended storage pattern in RSDK apps.
 
-Use `ctx.ApplicationStorage` for user-scoped persistence (requires authentication).
-Use `ctx.DeviceStorage` only for local, device-scoped data that doesn't need a logged-in user.
+## Choose the right storage
 
-## Recommended helper
+- Use `context.ApplicationStorage` for authenticated, user-scoped data.
+- Use `context.DeviceStorage` for local device data that does not depend on a signed-in user.
 
-Centralize storage access through a single helper so the source can be changed in one place:
+Default to `ApplicationStorage` unless the data is intentionally local-only.
+
+## Centralize access
+
+Wrap storage access in one helper so auth checks and future changes stay in one place.
 
 ```csharp
 public static class StorageHelper
 {
-    // Returns device storage. Add auth check and switch to ApplicationStorage when needed.
-    public static IDeviceStorage GetStorage(IThinClientContext ctx)
-        => ctx.DeviceStorage;
+    public static IUserStorage GetUserStorage(IThinClientContext context)
+    {
+        if (string.IsNullOrEmpty(context.User?.Id))
+            throw new NotAuthenticated();
+
+        return context.ApplicationStorage;
+    }
 }
 ```
 
+If a feature is device-only, use a separate helper returning `context.DeviceStorage`.
+
 ## Usage
 
-Use `Load` to read and `Save` to write:
-
 ```csharp
-var storage = StorageHelper.GetStorage(ctx);
-var store = await storage.Get<MyStore>(MyStore.Key) ?? new MyStore();
+var storage = StorageHelper.GetUserStorage(context);
+var store = await storage.Get<MyStore>(MyStore.Key) ?? new MyStore { Id = MyStore.Key };
 
-store.Id = MyStore.Key;
+store.Name = request.Name;
 await storage.Store(store);
 ```
 
-The `?? new MyStore()` guard handles the first run when nothing is stored yet.
+## Registration
 
-## Entity Registration
-
-Every store type persisted via `storage.Store(...)` must be registered in `App.OnInit` so the framework knows how to serialize/deserialize it:
+Every type you persist must be registered in `OnInit` so the framework can serialize and deserialize it correctly.
 
 ```csharp
 RegisterEntity<ContactStore>();
-RegisterEntity<SenderStore>();
-RegisterEntity<CampaignStore>();
-RegisterEntity<CampaignLogStore>();
+RegisterEntity<SettingsData>();
 ```
 
-If a store is written but not registered, data may fail to persist or load correctly.
+## Notes
+
+- Singleton-style records should use a fixed key.
+- Reuse helper methods rather than spreading storage selection logic across actions.
+- Keep storage entities simple and stable.
