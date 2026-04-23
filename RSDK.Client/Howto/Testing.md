@@ -185,7 +185,7 @@ Your own control may inject more services. When a test fails to render, the exce
 
 `RunAction` on the base control ultimately calls `DialogService.Handle(...)`. A plain `A.Fake<IDialogService>()` often returns a proxy object from `Handle`, and the later cast to the expected payload type fails with `InvalidCastException`.
 
-**Option A - return a known payload (recommended):**
+**Mock known payload from calling RunAction on ui:**
 
 ```csharp
 A.CallTo(() => dialogService.Handle(A<Func<Task<IPayload>>>._))
@@ -193,15 +193,6 @@ A.CallTo(() => dialogService.Handle(A<Func<Task<IPayload>>>._))
 ```
 
 Use this when the control calls `RunAction` during first render and the test only needs predictable initialization data.
-
-**Option B - call through to the real delegate:**
-
-```csharp
-A.CallTo(() => dialogService.Handle(A<Func<Task<IPayload>>>._))
-    .ReturnsLazily(call => call.Arguments.Get<Func<Task<IPayload>>>(0)!());
-```
-
-Use this only when you need the real action pipeline to execute. It requires the app to be initialized and actions to be registered first, otherwise you get errors such as `Application action not found for X`.
 
 ## `IThinClientContext` setup
 
