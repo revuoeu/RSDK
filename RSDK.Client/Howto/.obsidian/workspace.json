@@ -11,10 +11,14 @@
             "id": "e49c8bb7faf4a9a5",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "SDK-Operations.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "Nowa karta"
+              "title": "SDK-Operations"
             }
           }
         ]
@@ -90,6 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "SDK-Operations.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -99,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Linki zwrotne"
+              "title": "Linki zwrotne do SDK-Operations"
             }
           },
           {
@@ -108,11 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "SDK-Operations.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Łącza wychodzące"
+              "title": "Łącza wychodzące od SDK-Operations"
             }
           },
           {
@@ -150,12 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "SDK-Operations.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Konspekt"
+              "title": "Konspekt SDK-Operations"
             }
           }
         ]
@@ -178,10 +185,14 @@
   },
   "active": "e49c8bb7faf4a9a5",
   "lastOpenFiles": [
-    "Testing.md",
+    "Readme.md",
     "SDK-Operations.md",
-    "index.md",
+    "Logic.md",
+    "I18N.md",
     "Guide.md",
-    "Controls.md"
+    "Entities.md",
+    "Controls.md",
+    "Storage.md",
+    "Testing.md"
   ]
 }
