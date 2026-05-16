@@ -36,6 +36,8 @@ public static class I18N
                     ["RSDK.Client.SDKApp.CreateNewProject_CreateTestProject"] = "Creating test project...",
                     ["RSDK.Client.SDKApp.GetSdkSettings"] = "Load SDK settings",
                     ["RSDK.Client.SDKApp.SaveSdkSettings"] = "Save SDK settings",
+                    ["RSDK.Client.SDKApp.ListProjectsInFolder"] = "List projects in folder",
+                    ["RSDK.Client.SDKApp.MyApplications"] = "My applications",
 
                     // NewProject UI (labels, help text)
                     ["RSDK.Client.NewProjectControl.ProjectType"] = "Project type",
@@ -107,6 +109,8 @@ public static class I18N
                     ["RSDK.Client.SDKApp.CreateNewProject_CreateTestProject"] = "Tworzenie projektu testów...",
                     ["RSDK.Client.SDKApp.GetSdkSettings"] = "Wczytaj ustawienia SDK",
                     ["RSDK.Client.SDKApp.SaveSdkSettings"] = "Zapisz ustawienia SDK",
+                    ["RSDK.Client.SDKApp.ListProjectsInFolder"] = "Pokaż projekty w folderze",
+                    ["RSDK.Client.SDKApp.MyApplications"] = "Moje aplikacje",
 
                     // NewProject UI (labels, help text)
                     ["RSDK.Client.NewProjectControl.ProjectType"] = "Typ projektu",
