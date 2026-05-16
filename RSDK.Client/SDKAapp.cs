@@ -105,7 +105,11 @@ public partial class SDKApp : BaseThinClientApp
 
         var list = await context.RunAction("AppManager.Client.AppManagerApp", "ListApps", null);
 
-        return null;
+        var result = new ApplicationList
+        {
+            //D = list?.D ?? new List<ApplicationManifest>()
+        };
+        return result;
     }
 
     // CreateNewProject* methods moved to `SDKApp.CreateNewProject.cs` (partial)
