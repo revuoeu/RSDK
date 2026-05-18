@@ -12,6 +12,17 @@
         "dependsOn": ["build RSDK.Client"]
     }, 
     {
+        "type": "shell",
+        "label": "Run Linux Workflow file",
+        "command": "/home/gal/Sandbox/Chat/Src/Revuo.Chat.Client.Gtk/bin/Debug/net10.0/Revuo.Chat.Client.Gtk",
+        "args": [
+            "workflow",
+            "${workspaceFolder}\\InstallRSDKWorkflow.json.rew"
+        ],
+        "dependsOn": ["build RSDK.Client"],
+        "problemMatcher": "$msCompile"
+    }, 
+    {
         "label": "Run Workflow",
         "type": "shell",
         "command": "Start-Process 'revuo://workflow?file=${workspaceFolder}\\InstallRSDKWorkflow.json.rew'",
