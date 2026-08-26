@@ -39,7 +39,9 @@ public partial class SDKApp : BaseThinClientApp
         // SDK settings (default folder for new projects)
         this.AddAction<SdkSettings>(GetSdkSettings);
         this.AddAction<SdkSettings>(SaveSdkSettings);
-        this.AddAction<FolderContent>(ListProjectsInFolder);
+        this.AddAction<FolderContent>(ListProjectsInFolder)
+        ;
+               
 
 
         this.AddControl<SdkSettingsControl>();
