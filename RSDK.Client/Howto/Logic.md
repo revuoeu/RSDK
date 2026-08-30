@@ -73,3 +73,20 @@ public class SaveFooResponse : BasePayloadWithErrors<Foo>
 - control logic in `.razor.cs`
 
 See `Storage.md` for persistence rules and `Entities.md` for payload/entity patterns.
+
+
+## RevuoMain
+If RevuoMain method is configured (no arguments, just returns a type) it will automatically run after opening the application in the UI. As a result you can create a main screen for your application without any additional code. The method should return a type that will be handled by some control.
+UI behaviour is also different: no extra overflow-y will be added. Usually when a control is started from the menu it happens automatically. That way you control also the UI aspect.
+
+This should be enough for your control
+
+```html
+<div class="h-100 bg-black overflow-y-auto border rounded p-2">
+
+    .... framed lines could be used ...
+    <FramedLine Centered="true" FullWidth="true" Classes="my-4">
+            ... your ui ...
+    </FramedLine>
+</div>
+```
