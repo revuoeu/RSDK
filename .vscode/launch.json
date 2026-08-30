@@ -6,7 +6,7 @@
         "type": "coreclr",
         "request": "attach",
         "processName": "Revuo.Chat.Client.exe",
-        "preLaunchTask": "Run Workflow"
+        "preLaunchTask": "Run Workflow in debug"
     },
     {
         "name": "Debug in Revuo Client GTK",

@@ -10,7 +10,6 @@ using System.Diagnostics;
 using System.IO;
 using Revuo.Chat.Abstraction;
 using RSDK.Client.Model;
-using Revuo.Chat.Abstraction.Base;
 
 namespace RSDK.Client;
 
@@ -151,16 +150,4 @@ public partial class SDKApp : BaseThinClientApp
         await context.DeviceStorage!.Store(request);
         return request;
     }
-}
-
-public class FolderContent : BasePayload<List<ProjectFolder>>
-{
-}
-
-public class ProjectFolder
-{
-    public string Name { get; set; } = "";
-    public string Path { get; set; } = "";
-
-    public ProjectType Type { get; set; } = ProjectType.Unkown;
 }

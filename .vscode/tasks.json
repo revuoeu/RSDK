@@ -3,8 +3,18 @@
   "tasks": [
     {
         "type": "shell",
-        "label": "Run Workflow file",
+        "label": "Run Workflow in install",
         "command": "C:\\Program Files\\WindowsApps\\63422Galcorp.535855D1F432_1.0.3515.0_x64__45pd5tvyvvbvw\\Revuo.Chat.Client.exe",
+        "args": [
+            "workflow",
+            "${workspaceFolder}\\InstallRSDKWorkflow.json.rew"
+        ],
+        "dependsOn": ["build RSDK.Client"]
+    }, 
+    {
+        "type": "shell",
+        "label": "Run Workflow in debug",
+        "command": "C:\\Work\\Sandbox\\Chat\\Src\\Revuo.Chat.Client\\bin\\Debug\\net10.0-windows10.0.22621.0\\win-x64\\Revuo.Chat.Client.exe",
         "args": [
             "workflow",
             "${workspaceFolder}\\InstallRSDKWorkflow.json.rew"
