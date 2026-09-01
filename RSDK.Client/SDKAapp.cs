@@ -9,6 +9,7 @@ using System.Linq;
 using System.Diagnostics;
 using System.IO;
 using Revuo.Chat.Abstraction;
+using Revuo.Chat.Abstraction.Base;
 using RSDK.Client.Model;
 
 namespace RSDK.Client;
@@ -38,8 +39,7 @@ public partial class SDKApp : BaseThinClientApp
         // SDK settings (default folder for new projects)
         this.AddAction<SdkSettings>(GetSdkSettings);
         this.AddAction<SdkSettings>(SaveSdkSettings);
-        this.AddAction<FolderContent>(ListProjectsInFolder)
-        ;
+        this.AddAction<FolderContent>(ListProjectsInFolder);
                
 
 
@@ -48,8 +48,35 @@ public partial class SDKApp : BaseThinClientApp
         this.AddControl<ListProjectsInFolderControl>();
 
         this.AddAction(MyApplications);
+        this.AddAction(EnableInstaller);
 
         return Task.CompletedTask;
+    }
+
+    public async Task<BasePayload<string>> EnableInstaller(IThinClientContext context)
+    {
+        // var do the workflow magic
+    
+        string workflow = @"
+        {
+            ""Name"": ""Init"",
+            ""Steps"": [
+                {
+                    ""ActionName"": ""ToggleUtility"",
+                    ""ApplicationName"": ""Installer.Client.InstallerApp""
+                },
+                {
+                    ""ActionName"": ""ToggleUtility"",
+                    ""ApplicationName"": ""Installer.Client.AppRegistryApp""
+                }
+            ]
+        }";
+
+        // shape only needs to match WorkflowDefinition's JSON; the receiving app deserializes it into its own type
+        var request = new BasePayload<object>(workflow.Deserialize<object>()!);
+        var result = await context.RunAction("Workflow.Client.WorkflowApp", "ExecuteWorkflow", request);
+
+        return new BasePayload<string>(result!.Serialize());
     }
 
     public async Task<FolderContent> ListProjectsInFolder(IThinClientContext context)

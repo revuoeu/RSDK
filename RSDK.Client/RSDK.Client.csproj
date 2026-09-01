@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Revuo.Abstractions" Version="1.0.11" />
-    <PackageReference Include="Revuo.Base" Version="1.0.7" />
-    <PackageReference Include="Revuo.Chat.Client.Base" Version="1.0.5" />
+    <PackageReference Include="Revuo.Abstractions" Version="1.0.12" />
+    <PackageReference Include="Revuo.Base" Version="1.0.12" />
+    <PackageReference Include="Revuo.Chat.Client.Base" Version="1.0.12" />
   </ItemGroup>
 
   <ItemGroup>
