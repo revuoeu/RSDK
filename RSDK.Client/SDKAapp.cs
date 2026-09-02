@@ -41,6 +41,9 @@ public partial class SDKApp : BaseThinClientApp
         this.AddAction<SdkSettings>(SaveSdkSettings);
         this.AddAction<FolderContent>(ListProjectsInFolder);
                
+        this.AddAction(ListProjectsInFolder);
+        this.AddAction(ShowInstallFromGithub);
+        this.AddAction(ShowRegistrationRequests);
 
 
         this.AddControl<SdkSettingsControl>();
@@ -53,6 +56,18 @@ public partial class SDKApp : BaseThinClientApp
         return Task.CompletedTask;
     }
 
+    private async Task<IPayload> ShowInstallFromGithub(IThinClientContext context)
+    {
+        var request = await context.RunAction("Installer.Client.InstallerApp", "ShowInstallFromGithub", null);
+        return request!;
+    }
+
+    private async Task<IPayload> ShowRegistrationRequests(IThinClientContext context)
+    {
+        var request = await context.RunAction("Installer.Client.AppRegistryApp", "ShowRegistrationRequests", null);
+        return request!;
+    }
+
     public async Task<BasePayload<string>> EnableInstaller(IThinClientContext context)
     {
         // var do the workflow magic
@@ -62,13 +77,9 @@ public partial class SDKApp : BaseThinClientApp
             ""Name"": ""Init"",
             ""Steps"": [
                 {
-                    ""ActionName"": ""ToggleUtility"",
+                    ""ActionName"": ""ToggleIsUtility"",
                     ""ApplicationName"": ""Installer.Client.InstallerApp""
                 },
-                {
-                    ""ActionName"": ""ToggleUtility"",
-                    ""ApplicationName"": ""Installer.Client.AppRegistryApp""
-                }
             ]
         }";
 
@@ -76,7 +87,7 @@ public partial class SDKApp : BaseThinClientApp
         var request = new BasePayload<object>(workflow.Deserialize<object>()!);
         var result = await context.RunAction("Workflow.Client.WorkflowApp", "ExecuteWorkflow", request);
 
-        return new BasePayload<string>(result!.Serialize());
+        return new BasePayload<string>(result!.SerializeForHumans());
     }
 
     public async Task<FolderContent> ListProjectsInFolder(IThinClientContext context)
