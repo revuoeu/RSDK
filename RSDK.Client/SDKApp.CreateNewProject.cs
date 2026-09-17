@@ -595,7 +595,7 @@ public static class I18N
             result.Log.Add($"Created test project file: {testProjectName}.csproj");
 
             // write the starter test file from template
-            var testTemplate = LoadTemplateFromAssembly("TestUnitTest.cs.tpl");
+            var testTemplate = LoadTemplateFromAssembly("TestUnitTest.tpl");
             var testFile = testTemplate!.Replace("{{ProjectName}}", projectName);
             File.WriteAllText(Path.Combine(testProjectDir, "UnitTest1.cs"), testFile);
             result.Log.Add("Created starter test: UnitTest1.cs");
