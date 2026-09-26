@@ -50,7 +50,6 @@ public partial class SDKApp
         var stepResult = new ProjectCreateProgress();
         stepResult.NewProjectRequest = newProjectRequest;
         stepResult.Culture = context.CurrentCulture;
-
         for (var i = 0; i < steps.Length; i++)
         {
             var step = steps[i];
@@ -109,13 +108,11 @@ public partial class SDKApp
 
         result.SetStep(this.Translator, result.Culture, nameof(CreateNewProject_DotnetNew));
 
-        // create the class library in its own subfolder, next to README and the test project
-        var projectDir = Path.Combine(projectPath, projectName);
-        var rundotnetnew =  await RunCommand(result, projectPath, projectName, "dotnet", $"new razorclasslib -f net10.0 -n \"{projectName}\" -o \"{projectName}\"");
+        var rundotnetnew =  await RunCommand(result, projectPath, projectName, "dotnet", $"new razorclasslib -f net10.0 -n \"{projectName}\" -o .");
         if(rundotnetnew.IsError())
             return rundotnetnew;
 
-        var rundotnetpackageinstall =  await RunCommand(result, projectDir, projectName, "dotnet", $"package update", true);
+        var rundotnetpackageinstall =  await RunCommand(result, projectPath, projectName, "dotnet", $"package update", true);
 
         return rundotnetpackageinstall;
     }
@@ -134,8 +131,6 @@ public partial class SDKApp
                 WorkingDirectory = projectPath,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                StandardOutputEncoding = System.Text.Encoding.UTF8,
-                StandardErrorEncoding = System.Text.Encoding.UTF8,
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
@@ -317,7 +312,7 @@ public partial class SDKApp
                 TypeName = "Installer.Model.InstallationRequest",
                 D = new
                 {
-                    DllPath = Path.Combine(projectPath, projectName, "bin", "Debug", "net10.0", projectName + ".dll"),
+                    DllPath = Path.Combine(projectPath, "bin", "Debug", "net10.0", projectName + ".dll"),
                     Culture = result.Culture ?? string.Empty
                 }
             };
@@ -326,14 +321,14 @@ public partial class SDKApp
             var instPath = Path.Combine(projectPath, "InstallationRequest.json");
             File.WriteAllText(instPath, instJson);
 
-            var workflowTemplate = LoadTemplateFromAssembly("InstallRSDKWorkflow.json.tpl");
+            var workflowTemplate = LoadTemplateFromAssembly("InstalWorkflow.json.tpl");
             string workflowJson = workflowTemplate.Replace("{{InstallationRequestPathJson}}", 
                 System.Text.Json.JsonSerializer.Serialize(instPath));
             
 
-            var workflowPath = Path.Combine(projectPath, "InstallRSDKWorkflow.json");
+            var workflowPath = Path.Combine(projectPath, "InstalWorkflow.json");
             File.WriteAllText(workflowPath, workflowJson);
-            result.Log.Add("Created Revuo workflow files: InstallationRequest.json + InstallRSDKWorkflow.json");
+            result.Log.Add("Created Revuo workflow files: InstallationRequest.json + InstalWorkflow.json");
 
             result.Percent = 95;
             return result;
@@ -400,8 +395,6 @@ public partial class SDKApp
                 WorkingDirectory = projectPath,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                StandardOutputEncoding = System.Text.Encoding.UTF8,
-                StandardErrorEncoding = System.Text.Encoding.UTF8,
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
@@ -422,13 +415,11 @@ public partial class SDKApp
                 if (!string.IsNullOrWhiteSpace(stderr)) result.Log.Add(stderr);
             }
 
-            var psi2 = new ProcessStartInfo("dotnet", $"sln add \"{Path.Combine(projectName, projectName + ".csproj")}\"")
+            var psi2 = new ProcessStartInfo("dotnet", $"sln add \"{projectName}.csproj\"")
             {
                 WorkingDirectory = projectPath,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                StandardOutputEncoding = System.Text.Encoding.UTF8,
-                StandardErrorEncoding = System.Text.Encoding.UTF8,
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
@@ -515,10 +506,8 @@ Thumbs.db
                 ? Path.GetFileName(projectPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))
                 : result.NewProjectRequest.ProjectName;
 
-            var projectDir = Path.Combine(projectPath, projectName);
-
             // 1) update project file to add Revuo package references (if not already present)
-            var projFile = Path.Combine(projectDir, projectName + ".csproj");
+            var projFile = Path.Combine(projectPath, projectName + ".csproj");
             if (File.Exists(projFile))
             {
                 var projText = File.ReadAllText(projFile);
@@ -539,7 +528,7 @@ Thumbs.db
             var appTemplate = LoadTemplateFromAssembly("App.tpl");
             var appCs = appTemplate!.Replace("{{ProjectName}}", projectName);
 
-            File.WriteAllText(Path.Combine(projectDir, "App.cs"), appCs);
+            File.WriteAllText(Path.Combine(projectPath, "App.cs"), appCs);
             result.Log.Add("Created App.cs (basic Revuo app)");
 
             // 3) create translations file (minimal)
@@ -564,11 +553,11 @@ public static class I18N
     }};
 }}
 ";
-            File.WriteAllText(Path.Combine(projectDir, "I18N.cs"), i18n);
+            File.WriteAllText(Path.Combine(projectPath, "I18N.cs"), i18n);
             result.Log.Add("Created I18N.cs (translations)");
 
             // 4) add a simple control (razor)
-            var componentFile = Path.Combine(projectDir, "Component1.razor");
+            var componentFile = Path.Combine(projectPath, "Component1.razor");
             var componenetTemplate = LoadTemplateFromAssembly("Componenet1.razor.tpl");
             
             File.WriteAllText(componentFile, componenetTemplate.Replace("{{ProjectName}}", projectName));
