@@ -49,8 +49,11 @@ public class SdkAppActionTests
 
         var settings = await _app.GetSdkSettings(ctx);
 
-        // storage is empty; the app should fall back to MyDocuments (non-empty)
-        Assert.False(string.IsNullOrWhiteSpace(settings.DefaultNewProjectFolder));
+        var expectedFolder = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+            "Revuo.SDK.Client",
+            "CSharpProjects");
+        Assert.Equal(expectedFolder, settings.DefaultNewProjectFolder);
     }
 
     [Fact]

@@ -175,7 +175,10 @@ public partial class SDKApp : BaseThinClientApp
     {
         var s = await context.DeviceStorage!.Get<SdkSettings>(SdkSettings.Key) ?? new SdkSettings();
         if(string.IsNullOrWhiteSpace(s.DefaultNewProjectFolder))
-            s.DefaultNewProjectFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            s.DefaultNewProjectFolder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                "Revuo.SDK.Client",
+                "CSharpProjects");
     
         return s;
     }
