@@ -70,7 +70,7 @@ public static class I18N
                     ["RSDK.Client.ListProjectsInFolderControl.Path"] = "Path",
 
                     ["ERROR_FOLDER_EXISTS_0"] = "Folder '{0}' already exists. Please choose a different project name or delete the existing folder.",
-                    ["ERROR_DOTNET_NEW_FAILED_0"] = "'dotnet new' failed: {0}",
+                    ["ERROR_DOTNET_COMMAND_FAILED_2"] = "Command '{0}' failed: {1}",
                     ["ERROR_EXCEPTION_0"] = "Unexpected error: {0}",
                     ["ERROR_COPY_HOWTO_0"] = "Failed to copy how‑to files: {0}",
                     ["ERROR_CREATE_FILES_0"] = "Failed to create project files: {0}",
@@ -146,7 +146,7 @@ public static class I18N
                     ["RSDK.Client.ListProjectsInFolderControl.Path"] = "Ścieżka",
 
                     ["ERROR_FOLDER_EXISTS_0"] = "Folder '{0}' już istnieje. Wybierz inną nazwę projektu lub usuń istniejący folder.",
-                    ["ERROR_DOTNET_NEW_FAILED_0"] = "'dotnet new' nie powiódł się: {0}",
+                    ["ERROR_DOTNET_COMMAND_FAILED_2"] = "Polecenie '{0}' nie powiodło się: {1}",
                     ["ERROR_EXCEPTION_0"] = "Nieoczekiwany błąd: {0}",
                     ["ERROR_COPY_HOWTO_0"] = "Nie udało się skopiować plików instrukcji: {0}",
                     ["ERROR_CREATE_FILES_0"] = "Nie udało się utworzyć plików projektu: {0}",

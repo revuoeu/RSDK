@@ -11,6 +11,7 @@ using System.IO;
 using System;
 using System.Threading.Tasks;
 using RSDK.Client.Model;
+using Revuo.Chat.Abstraction;
 
 namespace RSDK.Client;
 
@@ -52,6 +53,8 @@ public partial class SDKApp
         stepResult.Culture = context.CurrentCulture;
         for (var i = 0; i < steps.Length; i++)
         {
+            context.Progress?.Report(new ActionProgressInfo((double)i / steps.Length, $"({i}/{steps.Length})"));
+
             var step = steps[i];
 
             // baseline progress for this step (don't override higher values set by the step itself)
@@ -105,7 +108,6 @@ public partial class SDKApp
         var projectName = string.IsNullOrWhiteSpace(result.NewProjectRequest.ProjectName)
             ? System.IO.Path.GetFileName(projectPath.TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar))
             : result.NewProjectRequest.ProjectName;
-        var applicationProjectPath = Path.Combine(projectPath, projectName);
 
         result.SetStep(this.Translator, result.Culture, nameof(CreateNewProject_DotnetNew));
 
@@ -113,17 +115,14 @@ public partial class SDKApp
         if(rundotnetnew.IsError())
             return rundotnetnew;
 
-        var rundotnetpackageinstall =  await RunCommand(result, applicationProjectPath, projectName, "dotnet", $"package update", true);
-
-        return rundotnetpackageinstall;
+        return rundotnetnew;
     }
 
     private async Task<ProjectCreateProgress> RunCommand(ProjectCreateProgress result,
         string projectPath, 
         string projectName,
         string command,
-        string args, 
-        bool ignoreErroCode = false)
+        string args)
     {
         try
         {
@@ -149,9 +148,16 @@ public partial class SDKApp
             if (!string.IsNullOrWhiteSpace(stderr))
                 result.Log.Add(stderr);
 
-            if (p.ExitCode != 0 && !ignoreErroCode)
+            if (p.ExitCode != 0)
             {
-                result.WithError(this.Translator, result.Culture, "ERROR_DOTNET_NEW_FAILED_0", stderr);
+                var output = string.Join(Environment.NewLine,
+                    new[] { stderr, stdout }.Where(text => !string.IsNullOrWhiteSpace(text)));
+                result.WithError(
+                    this.Translator,
+                    result.Culture,
+                    "ERROR_DOTNET_COMMAND_FAILED_2",
+                    $"{command} {args}",
+                    output);
                 return result;
             }
 
@@ -536,6 +542,10 @@ Thumbs.db
                     result.Log.Add($"Updated project file: {Path.GetFileName(projFile)} (added Revuo package references)");
                 }
             }
+
+            var packageUpdate = await RunCommand(result, applicationProjectPath, projectName, "dotnet", "package update");
+            if (packageUpdate.IsError())
+                return packageUpdate;
 
             // 2) create application class that uses StaticTranslator and registers one control
             var appTemplate = LoadTemplateFromAssembly("App.tpl");
