@@ -300,7 +300,11 @@ public partial class SDKApp
             var vsDir = Path.Combine(projectPath, ".vscode");
             Directory.CreateDirectory(vsDir);
             var tasksTemplate = LoadTemplateFromAssembly("tasks.json.tpl");
-            var tasksText = tasksTemplate.Replace("{{ProjectName}}", projectName);
+            var revuoChatClientExePath = Environment.ProcessPath
+                ?? Path.Combine(AppContext.BaseDirectory, "Revuo.Chat.Client.exe");
+            var tasksText = tasksTemplate
+                .Replace("{{ProjectName}}", projectName)
+                .Replace("{{RevuoChatClientExePathJson}}", System.Text.Json.JsonSerializer.Serialize(revuoChatClientExePath));
             File.WriteAllText(Path.Combine(vsDir, "tasks.json"), tasksText);
 
             var launchTemplate = LoadTemplateFromAssembly("launch.json.tpl");
@@ -329,9 +333,9 @@ public partial class SDKApp
                 System.Text.Json.JsonSerializer.Serialize(instPath));
             
 
-            var workflowPath = Path.Combine(projectPath, "InstalWorkflow.json");
+            var workflowPath = Path.Combine(projectPath, "InstallWorkflow.json");
             File.WriteAllText(workflowPath, workflowJson);
-            result.Log.Add("Created Revuo workflow files: InstallationRequest.json + InstalWorkflow.json");
+            result.Log.Add("Created Revuo workflow files: InstallationRequest.json + InstallWorkflow.json");
 
             result.Percent = 95;
             return result;
