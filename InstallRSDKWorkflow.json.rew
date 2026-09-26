@@ -6,7 +6,7 @@
       "Order": 1,
       "ApplicationName": "Installer.Client.InstallerApp",
       "ActionName": "InstallFromDll",
-      "ParameterFilePath": "C:\\Work\\Sandbox\\RSDK\\InstallationRequest.json",
+      "ParameterFilePath": "E:\\Work\\RSDK\\InstallationRequest.json",
       "ContinueOnError": true
     },
     {

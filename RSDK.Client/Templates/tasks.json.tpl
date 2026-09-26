@@ -17,7 +17,7 @@
         "label": "build RSDK.Client",
         "args": [
             "build",
-            "${workspaceFolder}/{{ProjectName}}.csproj",
+            "${workspaceFolder}/{{ProjectName}}/{{ProjectName}}.csproj",
             "-c",
             "Debug"
         ],

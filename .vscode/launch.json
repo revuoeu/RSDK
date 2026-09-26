@@ -6,21 +6,36 @@
         "type": "coreclr",
         "request": "attach",
         "processName": "Revuo.Chat.Client.exe",
-        "preLaunchTask": "Run Workflow"
+        "preLaunchTask": "Run Workflow",
+        "presentation": {
+          "hidden": false,
+          "group": "RSDK",
+          "order": 1
+        }
     }, 
     {
         "name": "Debug in Revuo Client Local",
         "type": "coreclr",
         "request": "attach",
         "processName": "Revuo.Chat.Client.exe",
-        "preLaunchTask": "Run Workflow in debug"
+        "preLaunchTask": "Run Workflow in debug",
+        "presentation": {
+          "hidden": false,
+          "group": "RSDK",
+          "order": 2
+        }
     },
     {
         "name": "Debug in Revuo Client GTK",
         "type": "coreclr",
         "request": "attach",
         "processName": "Revuo.Chat.Client.Gtk",
-        "preLaunchTask": "Run Linux Workflow file"
+        "preLaunchTask": "Run Linux Workflow file",
+        "presentation": {
+          "hidden": false,
+          "group": "RSDK",
+          "order": 3
+        }
     }
   ]
 }

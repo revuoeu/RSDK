@@ -38,6 +38,9 @@ public static class I18N
                     ["RSDK.Client.SDKApp.SaveSdkSettings"] = "Save SDK settings",
                     ["RSDK.Client.SDKApp.ListProjectsInFolder"] = "List projects in folder",
                     ["RSDK.Client.SDKApp.MyApplications"] = "My applications",
+                    ["RSDK.Client.SDKApp.ShowInstallFromGithub"] = "Install from GitHub",
+                    ["RSDK.Client.SDKApp.ShowRegistrationRequests"] = "Registration requests",
+                    ["RSDK.Client.SDKApp.EnableInstaller"] = "Enable installer",
 
                     // NewProject UI (labels, help text)
                     ["RSDK.Client.NewProjectControl.ProjectType"] = "Project type",
@@ -111,6 +114,9 @@ public static class I18N
                     ["RSDK.Client.SDKApp.SaveSdkSettings"] = "Zapisz ustawienia SDK",
                     ["RSDK.Client.SDKApp.ListProjectsInFolder"] = "Pokaż projekty w folderze",
                     ["RSDK.Client.SDKApp.MyApplications"] = "Moje aplikacje",
+                    ["RSDK.Client.SDKApp.ShowInstallFromGithub"] = "Instaluj z GitHuba",
+                    ["RSDK.Client.SDKApp.ShowRegistrationRequests"] = "Prośby o rejestrację",
+                    ["RSDK.Client.SDKApp.EnableInstaller"] = "Włącz instalator",
 
                     // NewProject UI (labels, help text)
                     ["RSDK.Client.NewProjectControl.ProjectType"] = "Typ projektu",

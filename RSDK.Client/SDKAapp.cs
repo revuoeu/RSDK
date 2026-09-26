@@ -41,7 +41,6 @@ public partial class SDKApp : BaseThinClientApp
         this.AddAction<SdkSettings>(SaveSdkSettings);
         this.AddAction<FolderContent>(ListProjectsInFolder);
                
-        this.AddAction(ListProjectsInFolder);
         this.AddAction(ShowInstallFromGithub);
         this.AddAction(ShowRegistrationRequests);
 
